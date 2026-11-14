@@ -47,4 +47,22 @@ class GeneratorTests(unittest.TestCase):
     def test_deterministic(self):
         self.assertEqual(render(sample()),render(copy.deepcopy(sample())))
 
+    def test_compact_layout_and_speed(self):
+        cal=sample()
+        for w in cal['weeks']:
+            for d in w['contributionDays']:
+                d['contributionCount']=0; d['contributionLevel']='NONE'
+        for d in cal['weeks'][-1]['contributionDays'][-2:]:
+            d['contributionCount']=6; d['contributionLevel']='SECOND_QUARTILE'
+        root=ET.fromstring(render(cal))
+        ship=root.find(".//{"+NS+"}g[@id='player-ship']")
+        clock=ship.find('{'+NS+'}animateTransform')
+        duration=float(clock.attrib['dur'][:-1])
+        self.assertTrue(6.5 <= duration <= 8.0, duration)
+        self.assertEqual(root.attrib['height'],'259')
+        top=min(int(r.attrib['y']) for r in ship.findall('{'+NS+'}rect'))
+        self.assertEqual(top-177,8)
+        self.assertIn('SCORE 0012', ET.tostring(root,encoding='unicode'))
+        self.assertNotIn('MISSION COMPLETE', ET.tostring(root,encoding='unicode'))
+
 if __name__=='__main__': unittest.main()
