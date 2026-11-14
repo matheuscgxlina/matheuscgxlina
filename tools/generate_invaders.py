@@ -122,16 +122,17 @@ def render(calendar, demo=False):
         animate(blast,'opacity',[0,1,.35,0,0],[0,hit,hit+.07,hit+.16,duration],duration)
     # Compact symmetrical pixel fighter, rendered on a 2px grid.
     ship=element(root,'g',id='player-ship',transform=f'translate({left} 0)')
-    # Explicit pixel coordinates keep the outline sharp at README scale.
+    # Merge contiguous pixels into horizontal runs in one compound path.
+    # Geometry and animation clock are unchanged from v4.0.
     sprite=[".......#.......", "......###......", "......###......", ".....#####.....", "..#..#####..#..", "..#.#######.#..", ".#############.", "###############", "##.#########.##", "....###.###....", ".....#...#....."]
+    outline=[]
     for row,line in enumerate(sprite):
-        for col,pixel in enumerate(line):
-            if pixel=='#':
-                element(ship,'rect',x=-15+col*2,y=185+row*2,width=2,height=2,fill='#ededed')
+        for run in re.finditer(r'#+',line):
+            px=-15+run.start()*2; py=185+row*2; w=len(run.group())*2
+            outline.append(f'M{px} {py} h{w} v2 h{-w} Z')
+    element(ship,'path',id='fighter-outline',d=' '.join(outline),fill='#ededed')
     element(ship,'rect',x=-1,y=193,width=2,height=6,fill='#777')
-    plume=element(ship,'g')
-    for px in (-5,5):
-        element(plume,'rect',x=px-1,y=207,width=2,height=4,fill='#aaa')
+    plume=element(ship,'path',d='M-6 207 h2 v4 h-2 Z M4 207 h2 v4 h-2 Z',fill='#aaa')
     animate(plume,'opacity',[.4,1,.4],[0,duration/2,duration],duration,mode='linear')
     element(ship,'animateTransform',attributeName='transform',type='translate',values=';'.join(positions),keyTimes=';'.join(f'{t/duration:.7f}' for t in times),dur=f'{duration}s',repeatCount='indefinite',calcMode='linear')
     for c,(launch,finish,top) in shots.items():

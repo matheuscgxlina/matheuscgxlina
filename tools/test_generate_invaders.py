@@ -60,9 +60,23 @@ class GeneratorTests(unittest.TestCase):
         duration=float(clock.attrib['dur'][:-1])
         self.assertTrue(6.5 <= duration <= 8.0, duration)
         self.assertEqual(root.attrib['height'],'259')
-        top=min(int(r.attrib['y']) for r in ship.findall('{'+NS+'}rect'))
+        top=min(int(y) for y in __import__('re').findall(r'M-?\d+ (\d+)',ship.find('{'+NS+'}path[@id="fighter-outline"]').attrib['d']))
         self.assertEqual(top-177,8)
         self.assertIn('SCORE 0012', ET.tostring(root,encoding='unicode'))
         self.assertNotIn('MISSION COMPLETE', ET.tostring(root,encoding='unicode'))
+
+    def test_optimized_ship(self):
+        root=ET.fromstring(render(sample()))
+        ship=root.find(".//{"+NS+"}g[@id='player-ship']")
+        self.assertEqual(len(ship),4)
+        self.assertEqual(ship.find('{'+NS+'}animateTransform').attrib['calcMode'],'linear')
+        outline=ship.find('{'+NS+'}path[@id="fighter-outline"]')
+        import re
+        actual=set()
+        for x,y,w in re.findall(r'M(-?\d+) (\d+) h(\d+) v2 h-\d+ Z',outline.attrib['d']):
+            actual.update((i,int(y)) for i in range(int(x),int(x)+int(w),2))
+        sprite=[".......#.......", "......###......", "......###......", ".....#####.....", "..#..#####..#..", "..#.#######.#..", ".#############.", "###############", "##.#########.##", "....###.###....", ".....#...#....."]
+        expected={(-15+c*2,185+r*2) for r,line in enumerate(sprite) for c,p in enumerate(line) if p=='#'}
+        self.assertEqual(actual,expected)
 
 if __name__=='__main__': unittest.main()
