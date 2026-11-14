@@ -4,17 +4,15 @@
 
 ## 01 / About
 
-I'm a software development student fascinated by how systems work beneath the surface. I enjoy building practical software, investigating operating system behavior, and making technology more reliable, secure and efficient.
+I'm a software development student interested in Windows internals, performance and security. I build small tools and automations, mostly in Python and PowerShell, and I'm learning C# and .NET for desktop development.
 
 ## 02 / Focus
 
-**Systems & performance** — Windows internals, system behavior and evidence-based optimization.
+**Systems and performance:** how Windows behaves under load, and measuring the effect of a change before keeping it.
 
-**Software engineering & security** — Maintainable architecture, testing and privacy by design.
+**Software and security:** readable code, tests, and careful handling of user data.
 
-**Automation & desktop software** — PowerShell workflows and exploring C#/.NET desktop development.
-
-**Engineering approach** — Research → Build → Validate → Refine. Performance, security and maintainability belong together.
+**Automation and desktop software:** scripts and tools in Python and PowerShell, and desktop apps with C# and WPF.
 
 ## 03 / Toolkit
 
@@ -22,6 +20,7 @@ I'm a software development student fascinated by how systems work beneath the su
   <p><strong>Working with</strong></p>
 
   <p>
+    <img src="assets/beyond/python.svg" width="100" alt="Python" />
     <img src="assets/beyond/powershell.svg" width="100" alt="PowerShell" />
     <img src="assets/beyond/git.svg" width="100" alt="Git" />
     <img src="assets/beyond/github.svg" width="100" alt="GitHub" />
@@ -43,7 +42,7 @@ I'm a software development student fascinated by how systems work beneath the su
 
 ## 04 / Projects
 
-**[MONO / INVADERS — Profile repository](https://github.com/matheuscgxlina/matheuscgxlina)** — Monochrome GitHub contribution arcade with an SVG renderer and daily automated updates.
+**[MONO / INVADERS](https://github.com/matheuscgxlina/matheuscgxlina)**: a monochrome GitHub contribution calendar rendered as an animated SVG. The renderer is written in Python and runs daily with GitHub Actions.
 
 <!--
 Add up to two additional public repositories here when they are ready.
@@ -58,7 +57,7 @@ Duplicate this item for a third project if needed.
   <img src="assets/beyond/invaders-v1.6.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
 
   <p>
-    <sub>Updated daily from GitHub contribution activity.</sub>
+    <sub>Generated daily from my GitHub contributions.</sub>
   </p>
 </div>
 

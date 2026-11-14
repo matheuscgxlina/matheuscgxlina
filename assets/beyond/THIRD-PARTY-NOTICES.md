@@ -6,7 +6,7 @@ The hero and engineering method illustrations are original custom artwork for th
 
 Source: https://github.com/devicons/devicon
 
-Original icons: `powershell/powershell-original.svg`, `git/git-original.svg`, `github/github-original.svg`, `windows11/windows11-original.svg`, `csharp/csharp-original.svg`, `visualstudio/visualstudio-original.svg`.
+Original icons: `powershell/powershell-original.svg`, `git/git-original.svg`, `github/github-original.svg`, `windows11/windows11-original.svg`, `csharp/csharp-original.svg`, `visualstudio/visualstudio-original.svg`, `python/python-original.svg` (grayscale adaptation).
 The original logo geometry is reproduced inside a custom tile.
 
 MIT License — Copyright (c) 2015 konpa
