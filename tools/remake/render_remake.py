@@ -98,17 +98,28 @@ def render(calendar, output):
     output=Path(output)
     output.parent.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output.parent) as directory:
+        # Both encoders receive precisely the same simulation frames.
+        frames=list(bounded())
         target=Path(directory)/"remake.webp"
         provider=WebPOutputProvider(str(target))
-        provider.write(provider.encode(bounded(),animator.frame_duration))
-        with Image.open(target) as im:
-            if not im.is_animated or im.info.get("loop")!=0 or im.n_frames<2:
-                raise ValueError("Invalid animated WebP")
-            elapsed=0
-            for i in range(im.n_frames):
-                im.seek(i); im.load(); elapsed+=im.info.get("duration",0)
-            print(f"Verified {im.n_frames} frames; {elapsed} ms; {im.size}; {TOTAL} contributions")
+        provider.write(provider.encode(iter(frames),animator.frame_duration))
+        gif=Path(directory)/"remake.gif"
+        # GIF uses centiseconds; alternate 20/30 ms to preserve 25 ms average.
+        delays=[20 if i%2==0 else 30 for i in range(len(frames))]
+        frames[0].save(gif,format="GIF",save_all=True,append_images=frames[1:],
+                       duration=delays,loop=0,optimize=True)
+        for path in (target,gif):
+            with Image.open(path) as im:
+                if not im.is_animated or im.info.get("loop")!=0 or im.n_frames<2:
+                    raise ValueError(f"Invalid animation: {path.suffix}")
+                elapsed=0
+                for i in range(im.n_frames):
+                    im.seek(i); im.load(); elapsed+=im.info.get("duration",0)
+                if abs(elapsed-len(frames)*animator.frame_duration)>100:
+                    raise ValueError(f"Unexpected duration: {path.suffix}")
+                print(f"Verified {path.suffix}: {im.n_frames} frames; {elapsed} ms; {im.size}; {TOTAL} contributions")
         target.replace(output)
+        gif.replace(output.with_suffix(".gif"))
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()

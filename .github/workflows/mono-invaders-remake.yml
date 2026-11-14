@@ -45,14 +45,14 @@ jobs:
           from pathlib import Path
           p = Path("README.md")
           s = p.read_text()
-          old = "assets/beyond/invaders-v10.svg"
-          new = "assets/beyond/invaders-remake.webp"
+          old = "assets/beyond/invaders-remake.webp"
+          new = "assets/beyond/invaders-remake.gif"
           if old in s:
               s = s.replace(old, new, 1)
               s = s.replace("Every contribution counts. Updated daily from GitHub activity.", "Every contribution counts. Updated daily from GitHub activity. MONO / INVADERS — REMAKE, based on gh-space-shooter (MIT).")
               p.write_text(s)
           PY
-          git add -- assets/beyond/invaders-remake.webp README.md
+          git add -- assets/beyond/invaders-remake.webp assets/beyond/invaders-remake.gif README.md
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
