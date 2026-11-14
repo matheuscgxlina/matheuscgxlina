@@ -73,19 +73,59 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     node(root,"title",id="title").text="MONO / INVADERS — Contribution Arcade"
     total=sum(d[3] for d in active)
     node(root,"desc",id="desc").text=("Demo data. " if demo else "GitHub contribution calendar. ")+f"{len(active)} active days, {total} contributions. Continuous sweep with synchronized projectiles."
-    # MONO v1.3: an open, editorial arcade panel, not nested cards.
-    node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=10,fill="#101010",stroke="#414141")
-    node(root,"path",d="M21 20V11H30 M874 11H883V20 M21 258V267H30 M874 267H883V258",stroke="#777",fill="none")
-    node(root,"path",id="mono-emblem",d="M25 29L32 15H36L29 29Z M33 29L40 15H44L37 29Z",fill="#f2f2f2")
-    text(root,55,29,"MONO / INVADERS",21,"#f2f2f2",font_weight="bold",letter_spacing="1.1")
-    text(root,WIDTH-25,20,"DEMO / SAMPLE DATA" if demo else "CONTRIBUTION ARCADE",10,"#c8c8c8",text_anchor="end",letter_spacing="1")
-    text(root,WIDTH-25,34,"MONOCHROME  /  53 WEEKS",8,"#858585",text_anchor="end",letter_spacing=".8")
-    node(root,"path",d="M22 43H882 M22 239H882",stroke="#383838",fill="none")
-    # A single quiet playing field, with a subtle flight guide.
-    node(root,"rect",x=20,y=65,width=864,height=116,rx=4,fill="#151515",stroke="#252525")
-    node(root,"path",d="M24 229H880",stroke="#333",stroke_dasharray="2 6",fill="none")
-    node(root,"path",d="M24 224V229H29 M875 229H880V224",stroke="#666",fill="none")
-    node(root,"path",d="M22 248V269 M882 248V269",stroke="#555",fill="none")
+    # Retro arcade presentation: static vector art only.
+    node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=10,fill="#090909",stroke="#454545")
+    node(root,"path",id="retro-frame",d="M18 5H886L899 18V260L886 273H18L5 260V18Z",fill="none",stroke="#bdbdbd",stroke_width=1.5)
+    node(root,"path",d="M20 10H884L894 20V258L884 268H20L10 258V20Z",fill="none",stroke="#555",stroke_width=1)
+    node(root,"path",d="M9 36V18L18 9H40 M864 9H886L895 18V36 M9 242V260L18 269H40 M864 269H886L895 260V242",fill="none",stroke="#ededed",stroke_width=2)
+    # Hand-built bitmap lettering, independent of installed fonts.
+    glyphs={
+        "M":["10001","11011","10101","10101","10001","10001","10001"],
+        "O":["01110","10001","10001","10001","10001","10001","01110"],
+        "N":["10001","11001","10101","10011","10001","10001","10001"],
+        "I":["11111","00100","00100","00100","00100","00100","11111"],
+        "V":["10001","10001","10001","10001","10001","01010","00100"],
+        "A":["01110","10001","10001","11111","10001","10001","10001"],
+        "D":["11110","10001","10001","10001","10001","10001","11110"],
+        "E":["11111","10000","10000","11110","10000","10000","11111"],
+        "R":["11110","10001","10001","11110","10100","10010","10001"],
+        "S":["01111","10000","10000","01110","00001","00001","11110"],
+        "/":["00001","00001","00010","00100","01000","10000","10000"],
+        " ":["00000"]*7,
+    }
+    title="MONO / INVADERS"
+    unit=3; advance=6*unit
+    title_x=(WIDTH-(len(title)*advance-unit))/2
+    pixels=[]
+    for i,ch in enumerate(title):
+        for row,line in enumerate(glyphs[ch]):
+            for col,pixel in enumerate(line):
+                if pixel=="1":
+                    px=title_x+i*advance+col*unit; py=15+row*unit
+                    pixels.append(f"M{px} {py}h{unit}v{unit}h-{unit}z")
+    node(root,"path",id="retro-title",d=" ".join(pixels),fill="#f1f1f1")
+    # Mirrored invader badges and speed lines evoke a classic arcade marquee.
+    invader="M-5 -5h2v2h6v-2h2v3h2v3h2v5h-3v-3h-2v4h-3v-2h-2v2h-3v-4h-2v3h-3v-5h2v-3h2z"
+    node(root,"path",id="mono-emblem",d=invader,transform="translate(78 25) scale(1.5)",fill="#e5e5e5")
+    node(root,"path",d=invader,transform="translate(826 25) scale(1.5)",fill="#e5e5e5")
+    for px in (78,826):
+        node(root,"path",d="M-4 0h2v2h-2z M2 0h2v2h-2z",transform=f"translate({px} 25) scale(1.5)",fill="#111")
+    node(root,"path",d="M105 20H300 M105 25H287 M105 30H274 M604 20H799 M617 25H799 M630 30H799",stroke="#777",stroke_width=1,fill="none")
+    node(root,"path",d="M22 43H882",stroke="#555",fill="none")
+    # Contribution field keeps its actual calendar geometry.
+    node(root,"path",d="M26 64H878L884 70V176L878 182H26L20 176V70Z",fill="#101010",stroke="#555",stroke_width=1)
+    # Static lunar silhouettes and sparse stars, confined to the playfield.
+    node(root,"path",id="retro-landscape",d="M20 231V217L35 208L49 193L59 198L70 211L85 205L100 216L115 211L129 221L143 216L170 231Z M884 231V219L870 209L851 193L837 204L828 216L811 208L799 220L783 213L766 224L750 219L731 231Z",fill="#191919")
+    node(root,"path",d="M20 231V217L35 208L49 193L59 198L70 211L85 205L100 216L115 211L129 221L143 216L170 231 M884 219L870 209L851 193L837 204L828 216L811 208L799 220L783 213L766 224L750 219L731 231",stroke="#585858",stroke_width=1,fill="none")
+    node(root,"path",d="M49 193L44 211L62 219 M85 205L91 216 M851 193L858 211L840 221 M811 208L802 221",stroke="#333",fill="none")
+    stars=[]
+    for px,py in ((190,196),(241,212),(294,188),(342,221),(390,201),(448,187),(506,216),(557,192),(607,224),(655,202),(708,188),(780,197),(112,190)):
+        stars.append(f"M{px-2} {py}h4v1h-4z M{px} {py-2}h1v5h-1z")
+    node(root,"path",d=" ".join(stars),fill="#777")
+    node(root,"path",d="M24 232H880",stroke="#777",stroke_dasharray="2 4",fill="none")
+    # Classic arcade HUD with angular score and statistics panels.
+    node(root,"path",d="M21 239H211L223 255L211 267H21L12 255Z M625 239H883L892 255L883 267H625L613 255Z",fill="#121212",stroke="#888")
+    node(root,"path",d="M228 250H365 M228 255H365 M539 250H608 M539 255H608",stroke="#555",fill="none")
     x=lambda c:GRID_X+c*STEP
     y=lambda r:GRID_Y+r*STEP
     cx=lambda c:x(c)+CELL/2
@@ -100,7 +140,7 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     for c,r,date,count,level in days:
         key=(date.year,date.month)
         if key!=last_month and c-last_col>=2:
-            text(root,x(c),58,date.strftime("%b").upper(),10,"#b0b0b0")
+            text(root,x(c),58,date.strftime("%b").upper(),10,"#d0d0d0")
             last_month=key; last_col=c
     # A projectile launches exactly as the ship crosses each occupied column.
     # It moves independently after launch, so the ship never waits for impact.
@@ -130,15 +170,13 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         visible(bolt,launch,end+0.008,duration)
         clock(bolt,"animateTransform","transform",[f"0 {SHIP_Y}",f"0 {SHIP_Y}",f"0 {top}",f"0 {top}"],
               [0,launch,end,duration],duration,type="translate")
-    # Original MONO silhouette, angular fighter with static metallic facets.
+    # Original pixel fighter: broad wings, stepped hull and twin thrusters.
     ship=node(root,"g",id="player-ship",transform=f"translate({LEFT} 0)")
-    # Angular interceptor: static facets keep the motion track lightweight.
-    node(ship,"path",id="fighter-hull",d="M0 190L7 204L14 207L19 199L21 216L14 222L5 217L0 223L-5 217L-14 222L-21 216L-19 199L-14 207L-7 204Z",fill="#eeeeee")
-    node(ship,"path",d="M0 190L7 204L5 217L0 223Z M-19 199L-14 207L-5 217L-14 222L-21 216Z",fill="#969696")
-    node(ship,"path",d="M0 197L4 207L0 214L-4 207Z",fill="#303030")
-    node(ship,"path",d="M0 201L2 207L0 210L-2 207Z",fill="#e5e5e5")
-    node(ship,"path",d="M-14 212H-9L-11 216H-16Z M14 212H9L11 216H16Z",fill="#505050")
-    node(ship,"path",d="M-10 222h3v3h-3z M7 222h3v3h-3z",fill="#bcbcbc")
+    node(ship,"path",id="fighter-hull",d="M-3 190H3V195H6V200H9V205H13V201H17V196H21V216H17V221H11V217H6V223H-6V217H-11V221H-17V216H-21V196H-17V201H-13V205H-9V200H-6V195H-3Z",fill="#eeeeee")
+    node(ship,"path",d="M-21 201H-17V211H-13V217H-17V216H-21Z M21 201H17V211H13V217H17V216H21Z M-3 190H0V200H-3Z",fill="#929292")
+    node(ship,"path",d="M-3 199H3V203H5V212H-5V203H-3Z",fill="#333")
+    node(ship,"rect",x=-2,y=202,width=4,height=5,fill="#bcbcbc")
+    node(ship,"path",d="M-12 220h4v5h-4z M8 220h4v5h-4z",fill="#aaa")
     clock(ship,"animateTransform","transform",[f"{LEFT} 0",f"{RIGHT} 0",f"{LEFT} 0"],
           [0,half,duration],duration,type="translate")
     # Real contribution count, not health or fabricated game points.
@@ -147,9 +185,9 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     times=[0]+sorted(events)+[duration]; points=0
     for i in range(len(times)-1):
         points+=events.get(times[i],0)
-        counter=text(root,32,261,f"SCORE {points:04d}",15,"#ededed",font_weight="bold",letter_spacing=".5")
+        counter=text(root,28,260,f"SCORE {points:04d}",15,"#ededed",font_weight="bold",letter_spacing=".5")
         visible(counter,times[i],times[i+1],duration)
-    text(root,WIDTH-32,261,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",11,"#c0c0c0",text_anchor="end")
+    text(root,WIDTH-28,260,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",10,"#d0d0d0",text_anchor="end")
     legend=node(root,"g",id="activity-legend")
     text(legend,WIDTH/2-48,261,"LOW",9,"#a9a9a9",text_anchor="end")
     for i, color in enumerate(COLORS.values()):

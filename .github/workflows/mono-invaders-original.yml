@@ -26,21 +26,21 @@ jobs:
       - name: Generate real contribution SVG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/original/render.py --speed 220 --output assets/beyond/invaders-original-v1.3.svg
+        run: python3 tools/original/render.py --speed 220 --output assets/beyond/invaders-original-v1.4.svg
       - name: Publish validated original
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p=Path("README.md")
           s=p.read_text()
-          old="assets/beyond/invaders-original-v1.2.svg"
-          new="assets/beyond/invaders-original-v1.3.svg"
+          old="assets/beyond/invaders-original-v1.3.svg"
+          new="assets/beyond/invaders-original-v1.4.svg"
           if old in s:
               s=s.replace(old,new,1)
               s=s.replace("MONO / INVADERS — Original Edition. MONO / INVADERS — Original Edition.","MONO / INVADERS — Original Edition.")
               p.write_text(s)
           PY
-          git add -- assets/beyond/invaders-original-v1.3.svg README.md
+          git add -- assets/beyond/invaders-original-v1.4.svg README.md
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

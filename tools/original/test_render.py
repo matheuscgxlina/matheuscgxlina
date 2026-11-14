@@ -51,6 +51,8 @@ class OriginalTests(unittest.TestCase):
         root=ET.fromstring(render(fixture()))
         self.assertIsNotNone(root.find(f".//{N}path[@id='fighter-hull']"))
         self.assertIsNotNone(root.find(f".//{N}path[@id='mono-emblem']"))
+        self.assertIsNotNone(root.find(f".//{N}path[@id='retro-title']"))
+        self.assertIsNotNone(root.find(f".//{N}path[@id='retro-landscape']"))
         ship=root.find(f".//{N}g[@id='player-ship']")
         self.assertEqual(len(list(ship.iter(N+"animateTransform"))),1)
         self.assertEqual(len(list(ship.iter(N+"animate"))),0)
