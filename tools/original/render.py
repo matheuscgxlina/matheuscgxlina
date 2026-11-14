@@ -154,19 +154,39 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
             hits[c,r]=impact
             tile=node(root,"g",transform=f"translate({cx(c)} {y(r)+6})")
             node(tile,"rect",x=-6,y=-6,width=12,height=12,rx=2,fill=COLORS[level])
-            node(tile,"path",d="M-4 -4H-3V-2H3V-4H4V-1H5V3H3V5H1V3H-1V5H-3V3H-5V-1H-4Z",
-                 fill="#181818" if level in ("THIRD_QUARTILE","FOURTH_QUARTILE") else "#eee")
+            # Nine-by-seven original bitmap sprite, with distinct eyes and legs.
+            sprite=("010000010","001000100","011111110","110111011",
+                    "111111111","101111101","001000100")
+            pixels=[]
+            for row,line in enumerate(sprite):
+                for col,pixel in enumerate(line):
+                    if pixel=="1":
+                        pixels.append(f"M{col-4.5} {row-3.5}h1v1h-1z")
+            node(tile,"path",id=f"enemy-{c}-{r}",d=" ".join(pixels),
+                 fill="#151515" if level in ("THIRD_QUARTILE","FOURTH_QUARTILE") else "#f1f1f1")
+            # Two tiny edge highlights make the enemy cell read as an arcade tile.
+            node(tile,"path",d="M-5 -4V-5H-3 M3 5H5V3",fill="none",
+                 stroke="#fff",stroke_opacity=".35",stroke_width=".6")
             visible(tile,0,impact,duration)
             # Compact, fading pixel fragments; not a filter or an external resource.
             blast=node(root,"g",transform=f"translate({cx(c)} {y(r)+6})")
-            node(blast,"path",d="M-9 -1h4v2h-4z M5 -1h4v2h-4z M-1 -9h2v4h-2z M-1 5h2v4h-2z",
-                 fill="#eee")
-            end=impact+0.16
-            clock(blast,"animate","opacity",[0,0,1,0,0],[0,impact-0.001,impact,end,duration],duration)
+            # One impact group: white core, branching pixel lightning and debris.
+            node(blast,"path",d="M-2 -2h4v4h-4z M-1 -10h2v5h-2z M-1 5h2v5h-2z M-10 -1h5v2h-5z M5 -1h5v2h-5z",fill="#fff")
+            node(blast,"path",d="M-3 -3L-7 -6H-5L-9 -10 M3 -3L7 -6H5L9 -10 M-3 3L-7 6H-5L-9 10 M3 3L7 6H5L9 10",stroke="#aaa",stroke_width="1.2",fill="none")
+            node(blast,"path",d="M-9 -6h2v2h-2z M7 4h2v2h-2z M-6 8h2v2h-2z M6 -9h2v2h-2z",fill="#e5e5e5")
+            end=impact+0.18
+            clock(blast,"animate","opacity",[0,0,1,.55,0,0],[0,impact-0.001,impact,impact+0.055,end,duration],duration)
         end=launch+(SHIP_Y-top)/BULLET_SPEED
         bolt=node(root,"g",opacity=0)
-        node(bolt,"rect",x=cx(c)-1.5,y=-5,width=3,height=10,rx=1,fill="#fff")
-        node(bolt,"rect",x=cx(c)-0.5,y=5,width=1,height=9,fill="#999")
+        # A layered pulse with a sharp white core and stepped ion trail.
+        bx=cx(c)
+        node(bolt,"path",d=f"M{bx-4} 1h2v-6h4v6h2v9h-2v5h-4v-5h-2z",fill="#555")
+        node(bolt,"path",d=f"M{bx-1.5} -7h3v14h-3z M{bx-.5} 7h1v9h-1z",fill="#fff")
+        node(bolt,"path",d=f"M{bx-5} 4h2v4h-2z M{bx+3} 4h2v4h-2z M{bx-2} 19h1v3h-1z M{bx+1} 19h1v3h-1z",fill="#aaa")
+        # Muzzle lightning is a single short-lived static shape, synchronized to launch.
+        flash=node(root,"g",transform=f"translate({bx} {SHIP_Y})",opacity=0)
+        node(flash,"path",d="M-2 -3H2V-9H4L0 -15L-4 -9H-2Z M-5 -2L-10 -7H-6L-8 -12 M5 -2L10 -7H6L8 -12",fill="#eee",stroke="#eee",stroke_width=".5")
+        clock(flash,"animate","opacity",[0,0,1,0,0],[0,launch-0.001,launch,launch+0.045,duration],duration)
         visible(bolt,launch,end+0.008,duration)
         clock(bolt,"animateTransform","transform",[f"0 {SHIP_Y}",f"0 {SHIP_Y}",f"0 {top}",f"0 {top}"],
               [0,launch,end,duration],duration,type="translate")

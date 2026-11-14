@@ -58,6 +58,15 @@ class OriginalTests(unittest.TestCase):
         self.assertEqual(len(list(ship.iter(N+"animate"))),0)
         self.assertNotIn("BY MATHEUS",ET.tostring(root,encoding="unicode"))
         self.assertIsNotNone(root.find(f".//{N}g[@id='activity-legend']"))
+    def test_combat_refinement(self):
+        root=ET.fromstring(render(fixture()))
+        enemies=[p for p in root.iter(N+"path") if p.get("id","").startswith("enemy-")]
+        self.assertEqual(len(enemies),2)
+        self.assertTrue(all(p.get("d","").count("h1v1h-1z")>20 for p in enemies))
+        tracks=[a for a in root.iter(N+"animate") if a.get("values")=="0;0;1;0;0"]
+        self.assertEqual(len(tracks),2)
+        ship=root.find(f".//{N}g[@id='player-ship']")
+        self.assertEqual(len(list(ship.iter(N+"animateTransform"))),1)
     def test_no_external_resources(self):
         s=render(fixture())
         self.assertNotIn("href=",s)
