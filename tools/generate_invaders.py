@@ -75,23 +75,23 @@ def render(calendar, demo=False):
     shots={}; hits={}
     for c in columns:
         cx=center(c)
-        clock+=max(.12,abs(cx-prev)/140)
+        clock+=max(.065,abs(cx-prev)/360)
         positions.append(f'{cx} 0'); times.append(clock)
-        launch=clock+.08
+        launch=clock+.035
         targets=sorted((d for d in active if d[0]==c),key=lambda d:-d[1])
         # The bolt travels vertically through the calendar, bottom to top.
         for d in targets:
-            hits[(c,d[1])]=launch+(206-(y(d[1])+6))/320
-        finish=max(hits[(c,d[1])] for d in targets)+.22
+            hits[(c,d[1])]=launch+(206-(y(d[1])+6))/560
+        finish=max(hits[(c,d[1])] for d in targets)+.13
         shots[c]=(launch,finish,min(y(d[1])+6 for d in targets))
-        clock=finish+.06
+        clock=finish+.025
         positions.append(f'{cx} 0'); times.append(clock); prev=cx
-    clock+=max(.15,abs(right-prev)/140)
+    clock+=max(.08,abs(right-prev)/360)
     positions.append(f'{right} 0'); times.append(clock)
-    clock+=.45; positions.append(f'{right} 0'); times.append(clock)
-    clock+=max(.35,abs(right-left)/190)
+    clock+=.12; positions.append(f'{right} 0'); times.append(clock)
+    clock+=max(.15,abs(right-left)/450)
     positions.append(f'{left} 0'); times.append(clock)
-    duration=round(clock+.45,6)
+    duration=round(clock+.12,6)
     positions.append(f'{left} 0'); times.append(duration)
     root=ET.Element('{'+NS+'}svg',{'viewBox':f'0 0 {width} {height}','width':str(width),'height':str(height),'role':'img','aria-labelledby':'title desc'})
     element(root,'title',id='title').text='MONO / INVADERS — contribution arcade'
@@ -119,18 +119,23 @@ def render(calendar, demo=False):
         animate(tile,'opacity',[1,0,0],[0,hit,duration],duration)
         blast=element(root,'g',opacity=0,stroke='#eee',stroke_width=1.4,fill='none')
         element(blast,'path',d=f'M{cx-9} {cy} h4 m10 0 h4 M{cx} {cy-9} v4 m0 10 v4 M{cx-7} {cy-7} l3 3 m8 8 l3 3 M{cx+7} {cy-7} l-3 3 m-8 8 l-3 3')
-        animate(blast,'opacity',[0,1,.35,0,0],[0,hit,hit+.08,hit+.20,duration],duration)
-    # Detailed pixel ship and soft engine plume, no external assets.
-    ship=element(root,'g',transform=f'translate({left} 0)')
-    element(ship,'path',d='M-22 220 H-17 V214 H-10 V207 H-4 V200 H4 V207 H10 V214 H17 V220 H22 V227 H8 V224 H-8 V227 H-22 Z',fill='#f1f1f1')
-    element(ship,'rect',x=-4,y=209,width=8,height=7,fill='#666')
-    element(ship,'rect',x=-15,y=221,width=5,height=3,fill='#777')
-    element(ship,'rect',x=10,y=221,width=5,height=3,fill='#777')
-    plume=element(ship,'path',d='M-5 226 H5 V230 H-5 Z',fill='#aaa')
-    animate(plume,'opacity',[.45,1,.45],[0,duration/2,duration],duration,mode='linear')
+        animate(blast,'opacity',[0,1,.35,0,0],[0,hit,hit+.05,hit+.12,duration],duration)
+    # Compact symmetrical pixel fighter, rendered on a 2px grid.
+    ship=element(root,'g',id='player-ship',transform=f'translate({left} 0)')
+    # Explicit pixel coordinates keep the outline sharp at README scale.
+    sprite=[".......#.......", "......###......", "......###......", ".....#####.....", "..#..#####..#..", "..#.#######.#..", ".#############.", "###############", "##.#########.##", "....###.###....", ".....#...#....."]
+    for row,line in enumerate(sprite):
+        for col,pixel in enumerate(line):
+            if pixel=='#':
+                element(ship,'rect',x=-15+col*2,y=200+row*2,width=2,height=2,fill='#ededed')
+    element(ship,'rect',x=-1,y=208,width=2,height=6,fill='#777')
+    plume=element(ship,'g')
+    for px in (-5,5):
+        element(plume,'rect',x=px-1,y=222,width=2,height=4,fill='#aaa')
+    animate(plume,'opacity',[.4,1,.4],[0,duration/2,duration],duration,mode='linear')
     element(ship,'animateTransform',attributeName='transform',type='translate',values=';'.join(positions),keyTimes=';'.join(f'{t/duration:.7f}' for t in times),dur=f'{duration}s',repeatCount='indefinite',calcMode='linear')
     for c,(launch,finish,top) in shots.items():
-        cx=center(c); impact=launch+(206-top)/320
+        cx=center(c); impact=launch+(206-top)/560
         bolt=element(root,'g',opacity=0)
         element(bolt,'rect',x=cx-1.5,y=-5,width=3,height=12,rx=1,fill='#fff')
         element(bolt,'rect',x=cx-2.5,y=7,width=5,height=9,rx=2,fill='#aaa',opacity=.55)
