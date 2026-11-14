@@ -14,6 +14,8 @@ I'm a software development student fascinated by how systems work beneath the su
 
 **Automation & desktop software** — PowerShell workflows and exploring C#/.NET desktop development.
 
+**Engineering approach** — Research → Build → Validate → Refine. Performance, security and maintainability belong together.
+
 ## 03 / Toolkit
 
 <div align="center">
@@ -39,26 +41,24 @@ I'm a software development student fascinated by how systems work beneath the su
   </p>
 </div>
 
-## 04 / Engineering approach
+## 04 / Projetos
 
-**Research → Build → Validate → Refine**
+**[MONO / INVADERS — Profile repository](https://github.com/matheuscgxlina/matheuscgxlina)** — Independent monochrome GitHub contribution arcade with an SVG renderer and automated updates.
 
-Understand the problem, implement with care, measure the result and improve deliberately.
-
-Performance, security and maintainability belong together.
+<!--
+Add up to two additional public repositories here when they are ready.
+Example (replace the placeholders with a real published repository):
+- **[Repository name](PUBLIC_REPOSITORY_URL)** — One concise sentence describing what it does and the technologies used.
+Duplicate this item for a third project if needed.
+-->
 
 ## 05 / Contribution Arcade
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/refs/heads/main/assets/beyond/invaders-original-v1.6.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
+  <img src="assets/beyond/invaders-v1.6.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
 
   <p>
-    <sub>Every contribution counts. Updated daily from GitHub activity. MONO / INVADERS — Original Edition.</sub>
+    <sub>Updated daily from GitHub contribution activity.</sub>
   </p>
 </div>
 
----
-
-<div align="center">
-  <sub>Curiosity drives progress. Precision builds trust.</sub>
-</div>
