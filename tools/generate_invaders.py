@@ -63,22 +63,44 @@ def animate(parent, attr, values, times, duration, mode='discrete'):
 def render(calendar, demo=False):
     days,ncols=parse(calendar)
     active=[d for d in days if d[3]>0]
-    columns=sorted({d[0] for d in active}, reverse=True)
-    # One volley per active week. The beam clears that week's active cells.
-    step=max(.48,min(1.8,24/max(1,len(columns))))
-    duration=round(3.2+len(columns)*step,3)
-    events={c:1.1+i*step for i,c in enumerate(columns)}
+    columns=sorted({d[0] for d in active})
     x=lambda c: 24+c*16
     y=lambda r: 69+r*16
-    width=904; height=255
+    center=lambda c: x(c)+6
+    # Sweep left to right. A projectile crosses the actual occupied cells of
+    # each active week; then the ship returns to its starting point.
+    left,right=center(0),center(ncols-1)
+    width=max(904,right+30); height=274
+    positions=[f'{left} 0']; times=[0.0]; clock=0.0; prev=left
+    shots={}; hits={}
+    for c in columns:
+        cx=center(c)
+        clock+=max(.12,abs(cx-prev)/140)
+        positions.append(f'{cx} 0'); times.append(clock)
+        launch=clock+.08
+        targets=sorted((d for d in active if d[0]==c),key=lambda d:-d[1])
+        # The bolt travels vertically through the calendar, bottom to top.
+        for d in targets:
+            hits[(c,d[1])]=launch+(206-(y(d[1])+6))/320
+        finish=max(hits[(c,d[1])] for d in targets)+.22
+        shots[c]=(launch,finish,min(y(d[1])+6 for d in targets))
+        clock=finish+.06
+        positions.append(f'{cx} 0'); times.append(clock); prev=cx
+    clock+=max(.15,abs(right-prev)/140)
+    positions.append(f'{right} 0'); times.append(clock)
+    clock+=.45; positions.append(f'{right} 0'); times.append(clock)
+    clock+=max(.35,abs(right-left)/190)
+    positions.append(f'{left} 0'); times.append(clock)
+    duration=round(clock+.45,6)
+    positions.append(f'{left} 0'); times.append(duration)
     root=ET.Element('{'+NS+'}svg',{'viewBox':f'0 0 {width} {height}','width':str(width),'height':str(height),'role':'img','aria-labelledby':'title desc'})
     element(root,'title',id='title').text='MONO / INVADERS — contribution arcade'
-    element(root,'desc',id='desc').text=('Illustrative demo calendar. ' if demo else 'GitHub contribution calendar. ')+f'{len(active)} active days; {sum(d[3] for d in active)} contributions in displayed cells. A ship clears active weeks in a repeating animation.'
+    total=sum(d[3] for d in active)
+    element(root,'desc',id='desc').text=('Illustrative demo calendar. ' if demo else 'GitHub contribution calendar. ')+f'{len(active)} active days; {total} contributions in displayed cells. A ship clears active days in a repeating animation.'
     element(root,'rect',width=width,height=height,rx=10,fill='#101010',stroke='#383838')
-    label(root,24,25,'MONO / INVADERS',16,'#f2f2f2',font_weight='bold')
-    label(root,880,25,'DEMO / SAMPLE DATA' if demo else 'CONTRIBUTION ARCADE',11,text_anchor='end')
-    element(root,'path',d='M24 36 H880 M24 207 H880',stroke='#3b3b3b',fill='none')
-    # Month boundaries are derived from the actual dates, not hard-coded.
+    label(root,24,26,'MONO / INVADERS',17,'#f2f2f2',font_weight='bold')
+    label(root,width-24,26,'DEMO / SAMPLE DATA' if demo else 'CONTRIBUTION ARCADE',11,text_anchor='end')
+    element(root,'path',d=f'M24 38 H{width-24} M24 233 H{width-24}',stroke='#3b3b3b',fill='none')
     months=set(); last_month_col=-10
     for c,r,date,count,level in days:
         key=(date.year,date.month)
@@ -86,40 +108,46 @@ def render(calendar, demo=False):
             label(root,x(c),57,date.strftime('%b').upper(),10); last_month_col=c
         months.add(key)
         element(root,'rect',x=x(c),y=y(r),width=12,height=12,rx=2,fill=COLORS['NONE'])
-        if count:
-            tile=element(root,'rect',x=x(c),y=y(r),width=12,height=12,rx=2,fill=COLORS[level]); hit=events[c]
-            animate(tile,'opacity',[1,0,0],[0,hit,duration],duration)
-            blast=element(root,'g',opacity=0,stroke='#fff',stroke_width=1.2,fill='none')
-            cx,cy=x(c)+6,y(r)+6
-            element(blast,'path',d=f'M{cx-8} {cy-8} l4 4 m8 8 l4 4 M{cx+8} {cy-8} l-4 4 m-8 8 l-4 4')
-            animate(blast,'opacity',[0,1,0,0],[0,hit,hit+.16,duration],duration)
-    ship=element(root,'g',transform='translate(450 0)')
-    element(ship,'path',d='M-19 191 H-12 V184 H-5 V176 H5 V184 H12 V191 H19 V198 H-19 Z',fill='#f1f1f1')
-    element(ship,'rect',x=-6,y=198,width=12,height=3,fill='#898989')
-    if columns:
-        positions=['450 0']; times=[0]
-        for c in columns:
-            hit=events[c]; positions.extend([f'{x(c)+6} 0',f'{x(c)+6} 0']); times.extend([hit-.20,hit+.18])
-        positions.append(positions[-1]); times.append(duration)
-        element(ship,'animateTransform',attributeName='transform',type='translate',values=';'.join(positions),keyTimes=';'.join(f'{t/duration:.7f}' for t in times),dur=f'{duration}s',repeatCount='indefinite',calcMode='linear')
-    for c in columns:
-        hit=events[c]; cx=x(c)+6; top=min(y(d[1])+6 for d in active if d[0]==c)
-        beam=element(root,'g',opacity=0)
-        element(beam,'line',x1=cx,y1=175,x2=cx,y2=top,stroke='#fff',stroke_width=2)
-        element(beam,'line',x1=cx,y1=175,x2=cx,y2=top,stroke='#bcbcbc',stroke_width=6,opacity=.2)
-        animate(beam,'opacity',[0,1,0,0],[0,hit-.16,hit+.06,duration],duration)
+        if not count: continue
+        cx,cy=center(c),y(r)+6; hit=hits[(c,r)]
+        # Pixel alien inside the original calendar cell; intensity reflects the real level.
+        tile=element(root,'g',transform=f'translate({cx} {cy})')
+        element(tile,'rect',x=-6,y=-6,width=12,height=12,rx=2,fill=COLORS[level])
+        element(tile,'path',d='M-4 -4 H-3 V-2 H3 V-4 H4 V-1 H5 V3 H3 V5 H1 V3 H-1 V5 H-3 V3 H-5 V-1 H-4 Z',fill='#fff' if level in ('FIRST_QUARTILE','SECOND_QUARTILE') else '#181818')
+        eye='#242424' if level in ('FIRST_QUARTILE','SECOND_QUARTILE') else '#eee'
+        for ex in (-3,2): element(tile,'rect',x=ex,y=0,width=1.5,height=1.5,fill=eye)
+        animate(tile,'opacity',[1,0,0],[0,hit,duration],duration)
+        blast=element(root,'g',opacity=0,stroke='#eee',stroke_width=1.4,fill='none')
+        element(blast,'path',d=f'M{cx-9} {cy} h4 m10 0 h4 M{cx} {cy-9} v4 m0 10 v4 M{cx-7} {cy-7} l3 3 m8 8 l3 3 M{cx+7} {cy-7} l-3 3 m-8 8 l-3 3')
+        animate(blast,'opacity',[0,1,.35,0,0],[0,hit,hit+.08,hit+.20,duration],duration)
+    # Detailed pixel ship and soft engine plume, no external assets.
+    ship=element(root,'g',transform=f'translate({left} 0)')
+    element(ship,'path',d='M-22 220 H-17 V214 H-10 V207 H-4 V200 H4 V207 H10 V214 H17 V220 H22 V227 H8 V224 H-8 V227 H-22 Z',fill='#f1f1f1')
+    element(ship,'rect',x=-4,y=209,width=8,height=7,fill='#666')
+    element(ship,'rect',x=-15,y=221,width=5,height=3,fill='#777')
+    element(ship,'rect',x=10,y=221,width=5,height=3,fill='#777')
+    plume=element(ship,'path',d='M-5 226 H5 V230 H-5 Z',fill='#aaa')
+    animate(plume,'opacity',[.45,1,.45],[0,duration/2,duration],duration,mode='linear')
+    element(ship,'animateTransform',attributeName='transform',type='translate',values=';'.join(positions),keyTimes=';'.join(f'{t/duration:.7f}' for t in times),dur=f'{duration}s',repeatCount='indefinite',calcMode='linear')
+    for c,(launch,finish,top) in shots.items():
+        cx=center(c); impact=launch+(206-top)/320
+        bolt=element(root,'g',opacity=0)
+        element(bolt,'rect',x=cx-1.5,y=-5,width=3,height=12,rx=1,fill='#fff')
+        element(bolt,'rect',x=cx-2.5,y=7,width=5,height=9,rx=2,fill='#aaa',opacity=.55)
+        animate(bolt,'opacity',[0,1,0,0],[0,launch,impact+.015,duration],duration)
+        element(bolt,'animateTransform',attributeName='transform',type='translate',values=f'0 206;0 206;0 {top};0 {top}',keyTimes=';'.join(f'{t/duration:.7f}' for t in [0,launch,impact,duration]),dur=f'{duration}s',repeatCount='indefinite',calcMode='linear')
     points=0
-    # Counter labels have disjoint visibility intervals and reset on each loop.
-    for i in range(len(columns)+1):
-        if i: points+=sum(d[3] for d in active if d[0]==columns[i-1])
-        start=0 if i==0 else events[columns[i-1]]
-        end=duration if i==len(columns) else events[columns[i]]
-        counter=label(root,24,232,f'SCORE {points:04d}',14,'#f1f1f1',opacity=1 if i==0 else 0,font_weight='bold')
+    ordered=sorted(active,key=lambda d:hits[(d[0],d[1])])
+    for i in range(len(ordered)+1):
+        if i: points+=ordered[i-1][3]
+        start=0 if i==0 else hits[(ordered[i-1][0],ordered[i-1][1])]
+        end=duration if i==len(ordered) else hits[(ordered[i][0],ordered[i][1])]
+        counter=label(root,24,255,f'SCORE {points:04d}',14,'#f1f1f1',opacity=1 if i==0 else 0,font_weight='bold')
         if i==0 and end<duration: animate(counter,'opacity',[1,0,0],[0,end,duration],duration)
         elif i and end<duration: animate(counter,'opacity',[0,1,0,0],[0,start,end,duration],duration)
         elif i: animate(counter,'opacity',[0,1,1],[0,start,duration],duration)
-    label(root,880,232,f'{len(active)} ACTIVE DAYS  /  {sum(d[3] for d in active)} CONTRIBUTIONS',11,text_anchor='end')
-    if not active: label(root,450,170,'AWAITING FIRST CONTRIBUTION',12,text_anchor='middle')
+    label(root,width-24,255,f'{len(active)} ACTIVE DAYS  /  {total} CONTRIBUTIONS',11,text_anchor='end')
+    if not active: label(root,width/2,191,'AWAITING FIRST CONTRIBUTION',11,text_anchor='middle')
     return ET.tostring(root,encoding='unicode')+'\n'
 
 def sample():

@@ -16,7 +16,9 @@ class GeneratorTests(unittest.TestCase):
                 d['contributionCount']=0; d['contributionLevel']='NONE'
         out=render(cal)
         self.assertIn('0 ACTIVE DAYS  /  0 CONTRIBUTIONS',out)
-        self.assertNotIn('animateTransform',out)
+        self.assertIn('animateTransform',out)
+        self.assertIn('SCORE 0000',out)
+        self.assertNotIn('MISSION COMPLETE',out)
     def test_two_days(self):
         cal=sample(); days=[d for w in cal['weeks'] for d in w['contributionDays']]
         for d in days: d['contributionCount']=0; d['contributionLevel']='NONE'
