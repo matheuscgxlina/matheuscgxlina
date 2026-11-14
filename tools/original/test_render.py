@@ -52,6 +52,22 @@ class OriginalTests(unittest.TestCase):
         self.assertIn("SCORE 0364",s)
         self.assertLess(len(s.encode()),MAX_BYTES)
         print("Dense fixture SVG bytes:",len(s.encode()))
+    def test_full_53_week_mixed_calendar_budget(self):
+        import datetime as dt
+        c=fixture(dense=True)
+        start=dt.date.fromisoformat(c["weeks"][-1]["contributionDays"][-1]["date"])+dt.timedelta(days=1)
+        c["weeks"].append({"contributionDays":[{"date":str(start+dt.timedelta(days=r)),
+            "weekday":r,"contributionCount":1,"contributionLevel":"FIRST_QUARTILE"} for r in range(7)]})
+        for col,w in enumerate(c["weeks"]):
+            for row,d in enumerate(w["contributionDays"]):
+                d.update(contributionCount=1+(col*37+row*19)%97,
+                         contributionLevel=list(COLORS)[1+(col+row)%4])
+        s=render(c); root=ET.fromstring(s)
+        total=sum(d["contributionCount"] for w in c["weeks"] for d in w["contributionDays"])
+        self.assertIn(f"371 ACTIVE DAYS / {total} CONTRIBUTIONS",s)
+        self.assertEqual(find(root,"g","scoreboard").find(N+"title").text,f"SCORE {total:04d}")
+        self.assertLess(len(s.encode()),MAX_BYTES)
+        print("Full mixed 53-week SVG bytes:",len(s.encode()))
     def test_layout_and_speed(self):
         root=ET.fromstring(render(fixture()))
         self.assertEqual(root.get("viewBox"),f"0 0 {WIDTH} {HEIGHT}")
@@ -78,8 +94,9 @@ class OriginalTests(unittest.TestCase):
     def test_combat_refinement(self):
         root=ET.fromstring(render(fixture()))
         self.assertGreater(find(root,"path","enemy-sprite").get("d").count("h1v1h-1z"),20)
-        enemies=[n for n in root.iter(N+"use") if n.get("href")=="#enemy-sprite"]
-        self.assertEqual(len(enemies),2)
+        enemies=[n for n in root.iter(N+"g") if n.get("id","").startswith("enemies-")]
+        self.assertEqual(sum(n.find(N+"path").get("d").count("M") for n in enemies),2)
+        self.assertIsNotNone(find(root,"pattern","enemy-pattern"))
         cutters=[n for n in root.iter(N+"clipPath") if n.get("id","").startswith("cut-")]
         self.assertEqual(len(cutters),2)
         self.assertTrue(all(n.find(N+"rect").find(N+"animate") is not None for n in cutters))

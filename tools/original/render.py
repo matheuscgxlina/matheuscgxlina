@@ -43,7 +43,7 @@ def clock(parent, tag, attr, values, times, duration, mode="linear", **attrs):
     if any(b<=a for a,b in zip(times,times[1:])):
         raise ValueError("Timeline must be strictly increasing")
     return node(parent,tag,attributeName=attr,values=";".join(map(str,values)),
-                keyTimes=";".join(f"{t/duration:.7f}".rstrip("0").rstrip(".") for t in times),
+                keyTimes=";".join(f"{t/duration:.6f}".rstrip("0").rstrip(".") for t in times),
                 dur=f"{duration:.6f}s",repeatCount="indefinite",calcMode=mode,**attrs)
 
 def visible(parent, start, end, duration):
@@ -136,11 +136,11 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         node(root,"path",d="M228 250H365 M228 255H365 M539 250H608 M539 255H608",stroke="#555",fill="none")
     x=lambda c:GRID_X+c*STEP
     y=lambda r:GRID_Y+r*STEP
-    cx=lambda c:x(c)+CELL/2
+    cx=lambda c:x(c)+CELL//2
     # Reusable vector definitions keep the whole calendar under 100 KB.
     defs=node(root,"defs")
     pattern=node(defs,"pattern",id="grid-pattern",patternUnits="userSpaceOnUse",
-                 x=GRID_X,y=GRID_Y,width=STEP,height=STEP)
+                 x=GRID_X,y=GRID_Y,width=STEP,height=STEP,viewBox=f"0 0 {STEP} {STEP}")
     node(pattern,"rect",width=CELL,height=CELL,rx=2,fill=COLORS["NONE"])
     node(root,"path",id="calendar-grid",d=f"M{GRID_X} {GRID_Y}h{52*STEP+CELL}v{6*STEP+CELL}h-{52*STEP+CELL}z",fill="url(#grid-pattern)")
     sprite=("010000010","001000100","011111110","110111011",
@@ -162,6 +162,12 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     # Internal SVG references only (no remote resources or JavaScript).
     def use(parent, ref, **attrs):
         return node(parent,"use",href="#"+ref,**attrs)
+
+    # Tile the same sprite inside a pattern, then paint only occupied cells.
+    # This avoids one <use> per active day in dense calendars.
+    enemy_pattern=node(defs,"pattern",id="enemy-pattern",patternUnits="userSpaceOnUse",
+                       x=GRID_X,y=GRID_Y,width=STEP,height=STEP,viewBox=f"0 0 {STEP} {STEP}")
+    use(enemy_pattern,"enemy-sprite",transform="translate(6 6)")
 
     # Every month stays anchored to its first represented calendar column.
     months={}
@@ -200,13 +206,14 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         clip=node(defs,"clipPath",id=f"cut-{c}",clipPathUnits="userSpaceOnUse")
         cutter=node(clip,"rect",x=x(c),y=GRID_Y,width=CELL,height=6*STEP+CELL)
         enemies=node(root,"g",id=f"enemies-{c}",clip_path=f"url(#cut-{c})")
-        ct=[0.0]; heights=[6*STEP+CELL]
+        ct=[0.0]; heights=[6*STEP+CELL]; enemy_cells=[]
         for _,r,_,count,level in targets:
             impact=launch+(SHIP_Y-(y(r)+6))/BULLET_SPEED
             hits[c,r]=impact
             by_row[r].append((impact,cx(c)))
-            use(enemies,"enemy-sprite",x=cx(c),y=y(r)+6)
+            enemy_cells.append(f"M{x(c)} {y(r)}h12v12h-12z")
             ct.append(impact); heights.append(y(r)-GRID_Y)
+        node(enemies,"path",d=" ".join(enemy_cells),fill="url(#enemy-pattern)")
         ct.append(duration); heights.append(heights[-1])
         clock(cutter,"animate","height",heights,ct,duration,"discrete")
         shots.append((launch,launch+(SHIP_Y-top)/BULLET_SPEED,cx(c),top))
