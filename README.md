@@ -1,74 +1,48 @@
-
 <div align="center">
-  <img src="assets/header.svg" width="100%" alt="Matheus — Build. Learn. Engineer." />
+  <img src="assets/monochrome/hero.svg" width="100%" alt="Matheus — Software development student. Systems, performance, security." />
 </div>
 
-<br />
+## 01 / About
 
-## About me
+I'm a software development student interested in how systems work beneath the surface. I enjoy writing practical software, understanding operating systems, and building solutions that balance performance, reliability and security.
 
-I'm a software development student with a passion for building fast, reliable and secure systems. I enjoy understanding how things work under the hood, turning complex problems into practical solutions, and learning through hands-on engineering.
+## 02 / Focus
 
-> **Build with purpose. Engineer with precision.**
+**Systems & performance** — Windows internals, system behavior and evidence-based optimization.
 
-## Areas of focus
+**Software engineering & security** — maintainable architecture, testing, privacy by design and dependable development.
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>01 / Systems &amp; Performance</h3>
-      Exploring Windows internals, system behavior, optimization and performance measurement.
-    </td>
-    <td width="50%" valign="top">
-      <h3>02 / Software Engineering</h3>
-      Building maintainable solutions with clear architecture, testing and automation.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>03 / Security &amp; Reliability</h3>
-      Learning secure software development, privacy by design and dependable engineering practices.
-    </td>
-    <td width="50%" valign="top">
-      <h3>04 / AI &amp; Automation</h3>
-      Exploring AI-assisted development, technical knowledge management and repeatable workflows.
-    </td>
-  </tr>
-</table>
+**Automation & desktop software** — PowerShell workflows, AI-assisted engineering and exploring C#/.NET desktop applications.
 
-## Technologies & Tools
+## 03 / Toolkit
 
 <div align="center">
-
-**Working with**
-
-<br />
-
-<img src="https://skillicons.dev/icons?i=powershell,git,github,windows&theme=dark" alt="PowerShell, Git, GitHub, Windows" />
-
-<br /><br />
-
-**Currently exploring**
-
-<br />
-
-<img src="https://skillicons.dev/icons?i=cs,dotnet,visualstudio&theme=dark" alt="C#, .NET, Visual Studio" />
-
-<br />
-
-<sub>C# · .NET · Desktop development with WPF</sub>
-
+  <p><strong>Working with</strong></p>
+  <p>
+    <img src="assets/monochrome/powershell.svg" width="86" alt="PowerShell" />
+    <img src="assets/monochrome/git.svg" width="86" alt="Git" />
+    <img src="assets/monochrome/github.svg" width="86" alt="GitHub" />
+    <img src="assets/monochrome/windows.svg" width="86" alt="Windows" />
+  </p>
+  <p><strong>Currently exploring</strong></p>
+  <p>
+    <img src="assets/monochrome/csharp.svg" width="86" alt="C#" />
+    <img src="assets/monochrome/dotnet.svg" width="86" alt=".NET" />
+    <img src="assets/monochrome/visualstudio.svg" width="86" alt="Visual Studio" />
+  </p>
+  <p><sub>C# / .NET / Desktop development with WPF</sub></p>
 </div>
 
-## Engineering mindset
+## 04 / Engineering mindset
 
-- Understand the problem before writing the solution.
-- Measure performance instead of assuming improvements.
-- Keep security, stability and maintainability in balance.
-- Learn continuously, document decisions and iterate with purpose.
+<div align="center">
+  <img src="assets/monochrome/method.svg" width="100%" alt="Research, build, validate, refine." />
+</div>
+
+I believe in understanding the problem first, measuring the result, and improving deliberately. Good engineering should make software easier to trust, maintain and evolve.
 
 ---
 
 <div align="center">
-  <sub>BUILD · LEARN · ENGINEER</sub>
+  <sub>Curiosity drives progress. Precision builds trust.</sub>
 </div>
