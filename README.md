@@ -20,11 +20,11 @@ I'm a software development student interested in Windows internals, performance 
   <p><strong>Working with</strong></p>
 
   <p>
-    <img src="assets/beyond/python.svg" width="100" alt="Python" />
-    <img src="assets/beyond/powershell.svg" width="100" alt="PowerShell" />
-    <img src="assets/beyond/git.svg" width="100" alt="Git" />
-    <img src="assets/beyond/github.svg" width="100" alt="GitHub" />
-    <img src="assets/beyond/windows.svg" width="100" alt="Windows" />
+    <img src="assets/beyond/python.svg" width="100" height="109" alt="Python" />
+    <img src="assets/beyond/powershell.svg" width="100" height="109" alt="PowerShell" />
+    <img src="assets/beyond/git.svg" width="100" height="109" alt="Git" />
+    <img src="assets/beyond/github.svg" width="100" height="109" alt="GitHub" />
+    <img src="assets/beyond/windows.svg" width="100" height="109" alt="Windows" />
   </p>
 
   <p><strong>Currently exploring</strong></p>
