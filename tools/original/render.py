@@ -73,18 +73,19 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     node(root,"title",id="title").text="MONO / INVADERS — Contribution Arcade"
     total=sum(d[3] for d in active)
     node(root,"desc",id="desc").text=("Demo data. " if demo else "GitHub contribution calendar. ")+f"{len(active)} active days, {total} contributions. Continuous sweep with synchronized projectiles."
-    node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=12,fill="#101010",stroke="#454545")
-    # Static, restrained instrument-panel styling. No additional animation tracks.
-    node(root,"rect",x=12,y=10,width=WIDTH-24,height=28,rx=5,fill="#181818")
-    node(root,"path",d="M22 31L28 17H32L26 31Z M29 31L35 17H39L33 31Z",fill="#ededed")
-    node(root,"path",d="M14 19V12H21 M883 12H890V19 M14 259V266H21 M883 266H890V259",stroke="#555",fill="none")
-    node(root,"rect",x=20,y=45,width=WIDTH-40,height=138,rx=6,fill="#141414",stroke="#252525")
-    node(root,"rect",x=20,y=185,width=WIDTH-40,height=46,rx=6,fill="#121212",stroke="#252525")
-    node(root,"path",d="M30 225H874",stroke="#303030",stroke_dasharray="2 6",fill="none")
-    node(root,"rect",x=12,y=244,width=WIDTH-24,height=25,rx=5,fill="#181818")
-    text(root,48,29,"MONO / INVADERS",17,"#f1f1f1",font_weight="bold",letter_spacing="1.2")
-    text(root,WIDTH-24,28,"DEMO / SAMPLE DATA" if demo else "CONTRIBUTION ARCADE",10,"#bcbcbc",text_anchor="end")
-    node(root,"path",d=f"M22 40 H{WIDTH-22} M22 {FOOTER_Y} H{WIDTH-22}",stroke="#353535",fill="none")
+    # MONO v1.3: an open, editorial arcade panel, not nested cards.
+    node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=10,fill="#101010",stroke="#414141")
+    node(root,"path",d="M21 20V11H30 M874 11H883V20 M21 258V267H30 M874 267H883V258",stroke="#777",fill="none")
+    node(root,"path",id="mono-emblem",d="M25 29L32 15H36L29 29Z M33 29L40 15H44L37 29Z",fill="#f2f2f2")
+    text(root,55,29,"MONO / INVADERS",21,"#f2f2f2",font_weight="bold",letter_spacing="1.1")
+    text(root,WIDTH-25,20,"DEMO / SAMPLE DATA" if demo else "CONTRIBUTION ARCADE",10,"#c8c8c8",text_anchor="end",letter_spacing="1")
+    text(root,WIDTH-25,34,"MONOCHROME  /  53 WEEKS",8,"#858585",text_anchor="end",letter_spacing=".8")
+    node(root,"path",d="M22 43H882 M22 239H882",stroke="#383838",fill="none")
+    # A single quiet playing field, with a subtle flight guide.
+    node(root,"rect",x=20,y=65,width=864,height=116,rx=4,fill="#151515",stroke="#252525")
+    node(root,"path",d="M24 229H880",stroke="#333",stroke_dasharray="2 6",fill="none")
+    node(root,"path",d="M24 224V229H29 M875 229H880V224",stroke="#666",fill="none")
+    node(root,"path",d="M22 248V269 M882 248V269",stroke="#555",fill="none")
     x=lambda c:GRID_X+c*STEP
     y=lambda r:GRID_Y+r*STEP
     cx=lambda c:x(c)+CELL/2
@@ -99,7 +100,7 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     for c,r,date,count,level in days:
         key=(date.year,date.month)
         if key!=last_month and c-last_col>=2:
-            text(root,x(c),59,date.strftime("%b").upper(),10,"#a0a0a0")
+            text(root,x(c),58,date.strftime("%b").upper(),10,"#b0b0b0")
             last_month=key; last_col=c
     # A projectile launches exactly as the ship crosses each occupied column.
     # It moves independently after launch, so the ship never waits for impact.
@@ -131,11 +132,13 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
               [0,launch,end,duration],duration,type="translate")
     # Original MONO silhouette, angular fighter with static metallic facets.
     ship=node(root,"g",id="player-ship",transform=f"translate({LEFT} 0)")
-    node(ship,"path",id="fighter-hull",d="M-3 190H3V194H6V199H9V204H13V201H17V196H21V216H15V219H9V216H5V222H-5V216H-9V219H-15V216H-21V196H-17V201H-13V204H-9V199H-6V194H-3Z",fill="#ededed")
-    node(ship,"path",d="M-17 202H-13V208H-9V213H-17Z M17 202H13V208H9V213H17Z",fill="#858585")
-    node(ship,"path",d="M-3 198H3V202H5V211H-5V202H-3Z",fill="#393939")
-    node(ship,"rect",x=-2,y=201,width=4,height=5,fill="#bcbcbc")
-    node(ship,"path",d="M-12 219h4v4h-4z M8 219h4v4h-4z",fill="#a0a0a0")
+    # Angular interceptor: static facets keep the motion track lightweight.
+    node(ship,"path",id="fighter-hull",d="M0 190L7 204L14 207L19 199L21 216L14 222L5 217L0 223L-5 217L-14 222L-21 216L-19 199L-14 207L-7 204Z",fill="#eeeeee")
+    node(ship,"path",d="M0 190L7 204L5 217L0 223Z M-19 199L-14 207L-5 217L-14 222L-21 216Z",fill="#969696")
+    node(ship,"path",d="M0 197L4 207L0 214L-4 207Z",fill="#303030")
+    node(ship,"path",d="M0 201L2 207L0 210L-2 207Z",fill="#e5e5e5")
+    node(ship,"path",d="M-14 212H-9L-11 216H-16Z M14 212H9L11 216H16Z",fill="#505050")
+    node(ship,"path",d="M-10 222h3v3h-3z M7 222h3v3h-3z",fill="#bcbcbc")
     clock(ship,"animateTransform","transform",[f"{LEFT} 0",f"{RIGHT} 0",f"{LEFT} 0"],
           [0,half,duration],duration,type="translate")
     # Real contribution count, not health or fabricated game points.
@@ -144,11 +147,11 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     times=[0]+sorted(events)+[duration]; points=0
     for i in range(len(times)-1):
         points+=events.get(times[i],0)
-        counter=text(root,22,261,f"SCORE {points:04d}",14,"#ededed",font_weight="bold")
+        counter=text(root,32,261,f"SCORE {points:04d}",15,"#ededed",font_weight="bold",letter_spacing=".5")
         visible(counter,times[i],times[i+1],duration)
-    text(root,WIDTH-22,261,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",11,text_anchor="end")
+    text(root,WIDTH-32,261,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",11,"#c0c0c0",text_anchor="end")
     legend=node(root,"g",id="activity-legend")
-    text(legend,WIDTH/2-48,261,"ACTIVITY",9,"#a9a9a9",text_anchor="end")
+    text(legend,WIDTH/2-48,261,"LOW",9,"#a9a9a9",text_anchor="end")
     for i, color in enumerate(COLORS.values()):
         node(legend,"rect",x=WIDTH/2-38+i*14,y=251,width=10,height=10,rx=2,fill=color)
     text(legend,WIDTH/2+39,261,"HIGH",9,"#a9a9a9")

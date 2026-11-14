@@ -50,6 +50,7 @@ class OriginalTests(unittest.TestCase):
     def test_visual_identity(self):
         root=ET.fromstring(render(fixture()))
         self.assertIsNotNone(root.find(f".//{N}path[@id='fighter-hull']"))
+        self.assertIsNotNone(root.find(f".//{N}path[@id='mono-emblem']"))
         ship=root.find(f".//{N}g[@id='player-ship']")
         self.assertEqual(len(list(ship.iter(N+"animateTransform"))),1)
         self.assertEqual(len(list(ship.iter(N+"animate"))),0)
