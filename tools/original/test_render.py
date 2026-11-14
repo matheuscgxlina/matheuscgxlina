@@ -53,7 +53,8 @@ class OriginalTests(unittest.TestCase):
         ship=root.find(f".//{N}g[@id='player-ship']")
         self.assertEqual(len(list(ship.iter(N+"animateTransform"))),1)
         self.assertEqual(len(list(ship.iter(N+"animate"))),0)
-        self.assertIn("BY MATHEUS  /  ORIGINAL",ET.tostring(root,encoding="unicode"))
+        self.assertNotIn("BY MATHEUS",ET.tostring(root,encoding="unicode"))
+        self.assertIsNotNone(root.find(f".//{N}g[@id='activity-legend']"))
     def test_no_external_resources(self):
         s=render(fixture())
         self.assertNotIn("href=",s)

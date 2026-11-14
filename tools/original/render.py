@@ -76,11 +76,13 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=12,fill="#101010",stroke="#454545")
     # Static, restrained instrument-panel styling. No additional animation tracks.
     node(root,"rect",x=12,y=10,width=WIDTH-24,height=28,rx=5,fill="#181818")
-    node(root,"rect",x=22,y=17,width=3,height=14,fill="#ededed")
+    node(root,"path",d="M22 31L28 17H32L26 31Z M29 31L35 17H39L33 31Z",fill="#ededed")
+    node(root,"path",d="M14 19V12H21 M883 12H890V19 M14 259V266H21 M883 266H890V259",stroke="#555",fill="none")
     node(root,"rect",x=20,y=45,width=WIDTH-40,height=138,rx=6,fill="#141414",stroke="#252525")
     node(root,"rect",x=20,y=185,width=WIDTH-40,height=46,rx=6,fill="#121212",stroke="#252525")
+    node(root,"path",d="M30 225H874",stroke="#303030",stroke_dasharray="2 6",fill="none")
     node(root,"rect",x=12,y=244,width=WIDTH-24,height=25,rx=5,fill="#181818")
-    text(root,33,29,"MONO / INVADERS",17,"#f1f1f1",font_weight="bold")
+    text(root,48,29,"MONO / INVADERS",17,"#f1f1f1",font_weight="bold",letter_spacing="1.2")
     text(root,WIDTH-24,28,"DEMO / SAMPLE DATA" if demo else "CONTRIBUTION ARCADE",10,"#bcbcbc",text_anchor="end")
     node(root,"path",d=f"M22 40 H{WIDTH-22} M22 {FOOTER_Y} H{WIDTH-22}",stroke="#353535",fill="none")
     x=lambda c:GRID_X+c*STEP
@@ -145,7 +147,11 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         counter=text(root,22,261,f"SCORE {points:04d}",14,"#ededed",font_weight="bold")
         visible(counter,times[i],times[i+1],duration)
     text(root,WIDTH-22,261,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",11,text_anchor="end")
-    text(root,WIDTH/2,261,"BY MATHEUS  /  ORIGINAL",10,"#a0a0a0",text_anchor="middle")
+    legend=node(root,"g",id="activity-legend")
+    text(legend,WIDTH/2-48,261,"ACTIVITY",9,"#a9a9a9",text_anchor="end")
+    for i, color in enumerate(COLORS.values()):
+        node(legend,"rect",x=WIDTH/2-38+i*14,y=251,width=10,height=10,rx=2,fill=color)
+    text(legend,WIDTH/2+39,261,"HIGH",9,"#a9a9a9")
     return ET.tostring(root,encoding="unicode")+"\n"
 
 def main():
