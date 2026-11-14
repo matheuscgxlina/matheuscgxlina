@@ -33,7 +33,7 @@ jobs:
           test "$(wc -c < /tmp/invaders-demo.svg)" -lt 100000
   publish:
     needs: validate
-    if: (github.event_name == 'schedule' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v1.6-refine'))
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/v1.6-refine') || (github.event_name == 'schedule' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v1.6-refine'))
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 tools/original/render.py --speed 145 --output assets/beyond/invaders-v1.6.svg
+          python3 tools/original/render.py --speed 195 --output assets/beyond/invaders-v1.6.svg
           test "$(wc -c < assets/beyond/invaders-v1.6.svg)" -lt 100000
           wc -c assets/beyond/invaders-v1.6.svg
       - name: Publish only the validated SVG to the current authorized branch

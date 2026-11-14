@@ -20,7 +20,7 @@ WIDTH, HEIGHT = 904, 278
 GRID_X, GRID_Y, STEP, CELL = 28, 69, 16, 12
 SHIP_Y, FOOTER_Y = 190, 239
 LEFT, RIGHT = 24, WIDTH - 24
-DEFAULT_SPEED = 145.0
+DEFAULT_SPEED = 195.0
 MAX_BYTES = 100_000
 BULLET_SPEED = 180.0
 COLORS = {"NONE":"#202020","FIRST_QUARTILE":"#737373",
@@ -62,8 +62,8 @@ def calendar_data(calendar):
     return [(c-start+offset,r,d,count,level) for c,r,d,count,level in days if c>=start]
 
 def render(calendar, speed=DEFAULT_SPEED, demo=False):
-    if not math.isfinite(speed) or not 120<=speed<=170:
-        raise ValueError("Speed must be between 120 and 170 px/s")
+    if not math.isfinite(speed) or not 120<=speed<=220:
+        raise ValueError("Speed must be between 120 and 220 px/s")
     days=calendar_data(calendar)
     active=[d for d in days if d[3]>0]
     half=(RIGHT-LEFT)/speed

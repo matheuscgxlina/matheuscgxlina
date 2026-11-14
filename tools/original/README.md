@@ -4,7 +4,7 @@ An independent, monochrome contribution arcade for GitHub profiles, maintained b
 
 ## Design
 
-- Continuous SVG sweep at 145 px/s, configurable from 120–170.
+- Continuous SVG sweep at 195 px/s, configurable from 120–220.
 - Projectiles launch as the ship crosses occupied columns; impact timing is calculated from distance.
 - Real contribution counts, 53-week calendar, compact particle effects, larger original ship.
 - No third-party runtime engine, packages, scripts in SVG, telemetry or personal access token.

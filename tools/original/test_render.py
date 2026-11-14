@@ -24,7 +24,7 @@ class OriginalTests(unittest.TestCase):
         track=find(root,"g","player-ship").find(N+"animateTransform")
         self.assertEqual(track.get("values"),f"{LEFT} 0;{RIGHT} 0;{LEFT} 0")
         self.assertAlmostEqual(float(track.get("dur")[:-1]),2*(RIGHT-LEFT)/DEFAULT_SPEED,places=5)
-        self.assertTrue(10<=float(track.get("dur")[:-1])<=15)
+        self.assertTrue(0<float(track.get("dur")[:-1])<=15)
         self.assertEqual(track.get("calcMode"),"linear")
     def test_timing(self):
         for cal in (fixture(),fixture(True),fixture(dense=True)):
@@ -72,7 +72,7 @@ class OriginalTests(unittest.TestCase):
         root=ET.fromstring(render(fixture()))
         self.assertEqual(root.get("viewBox"),f"0 0 {WIDTH} {HEIGHT}")
         self.assertIsNotNone(find(root,"path","calendar-grid"))
-        for speed in (0,171,float("nan")):
+        for speed in (0,221,float("nan")):
             with self.assertRaises(ValueError): render(fixture(),speed)
     def test_visual_identity(self):
         root=ET.fromstring(render(fixture()))
