@@ -2,47 +2,59 @@ name: MONO / INVADERS — Original
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [v1.6-refine]
     paths:
       - 'tools/original/**'
+      - 'tools/generate_invaders.py'
       - '.github/workflows/mono-invaders-original.yml'
+      - 'README.md'
+  pull_request:
+    branches: [main]
   schedule:
     - cron: '47 3 * * *'
 permissions:
-  contents: write
+  contents: read
 concurrency:
-  group: mono-invaders-original
+  group: mono-invaders-original-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  render:
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: main
+          persist-credentials: false
       - name: Test independent engine
         run: python3 -m unittest discover -s tools/original -p 'test_*.py' -v
+      - name: Validate demo size and XML
+        run: |
+          python3 tools/original/render.py --demo --output /tmp/invaders-demo.svg
+          test "$(wc -c < /tmp/invaders-demo.svg)" -lt 100000
+  publish:
+    needs: validate
+    if: (github.event_name == 'schedule' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v1.6-refine'))
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.ref_name }}
       - name: Generate real contribution SVG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/original/render.py --speed 220 --output assets/beyond/invaders-original-v1.6.svg
-      - name: Publish validated original
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path("README.md")
-          s=p.read_text()
-          old="assets/beyond/invaders-original-v1.5.svg"
-          new="assets/beyond/invaders-original-v1.6.svg"
-          if old in s:
-              s=s.replace(old,new,1)
-              s=s.replace("MONO / INVADERS — Original Edition. MONO / INVADERS — Original Edition.","MONO / INVADERS — Original Edition.")
-              p.write_text(s)
-          PY
-          git add -- assets/beyond/invaders-original-v1.6.svg README.md
+          python3 tools/original/render.py --speed 195 --output assets/beyond/invaders-v1.6.svg
+          test "$(wc -c < assets/beyond/invaders-v1.6.svg)" -lt 100000
+          wc -c assets/beyond/invaders-v1.6.svg
+      - name: Publish only the validated SVG to the current authorized branch
+        run: |
+          case "$GITHUB_REF_NAME" in main|v1.6-refine) ;; *) exit 1 ;; esac
+          git add -- assets/beyond/invaders-v1.6.svg
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Update original MONO Invaders arcade'
-          git push origin HEAD:main
+          git commit -m 'Update MONO Invaders v1.6 contribution SVG'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
