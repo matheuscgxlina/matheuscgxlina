@@ -21,10 +21,10 @@ GRID_X, GRID_Y, STEP, CELL = 28, 69, 16, 12
 SHIP_Y, FOOTER_Y = 190, 239
 LEFT, RIGHT = 24, WIDTH - 24
 DEFAULT_SPEED = 220.0
-BULLET_SPEED = 420.0
-COLORS = {"NONE":"#292929","FIRST_QUARTILE":"#666666",
-          "SECOND_QUARTILE":"#999999","THIRD_QUARTILE":"#c0c0c0",
-          "FOURTH_QUARTILE":"#f1f1f1"}
+BULLET_SPEED = 180.0
+COLORS = {"NONE":"#202020","FIRST_QUARTILE":"#737373",
+          "SECOND_QUARTILE":"#aaaaaa","THIRD_QUARTILE":"#d4d4d4",
+          "FOURTH_QUARTILE":"#ffffff"}
 
 def node(parent, tag, **attrs):
     return ET.SubElement(parent, "{"+NS+"}"+tag,
@@ -121,11 +121,18 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     stars=[]
     for px,py in ((190,196),(241,212),(294,188),(342,221),(390,201),(448,187),(506,216),(557,192),(607,224),(655,202),(708,188),(780,197),(112,190)):
         stars.append(f"M{px-2} {py}h4v1h-4z M{px} {py-2}h1v5h-1z")
-    node(root,"path",d=" ".join(stars),fill="#777")
+    starfield=node(root,"path",id="patrol-stars",d=" ".join(stars),fill="#777")
+    if len(active)<=5:
+        # One subtle ambient animation for sparse calendars; no invented activity.
+        clock(starfield,"animate","opacity",[.38,1,.38],[0,duration/2,duration],duration)
     node(root,"path",d="M24 232H880",stroke="#777",stroke_dasharray="2 4",fill="none")
     # Classic arcade HUD with angular score and statistics panels.
-    node(root,"path",d="M21 239H211L223 255L211 267H21L12 255Z M625 239H883L892 255L883 267H625L613 255Z",fill="#121212",stroke="#888")
-    node(root,"path",d="M228 250H365 M228 255H365 M539 250H608 M539 255H608",stroke="#555",fill="none")
+    node(root,"path",d="M21 239H211L223 255L211 267H21L12 255Z M606 239H883L892 255L883 267H606L594 255Z",fill="#121212",stroke="#888")
+    if len(active)<=5:
+        text(root,297,260,"PATROL MODE" if active else "NO ACTIVITY",11,"#dedede",text_anchor="middle")
+        node(root,"path",d="M539 250H589 M539 255H589",stroke="#555",fill="none")
+    else:
+        node(root,"path",d="M228 250H365 M228 255H365 M539 250H608 M539 255H608",stroke="#555",fill="none")
     x=lambda c:GRID_X+c*STEP
     y=lambda r:GRID_Y+r*STEP
     cx=lambda c:x(c)+CELL/2
@@ -136,12 +143,26 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
             a,b=x(c),y(r)
             grid.append(f"M{a+2} {b}h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-8a2 2 0 0 1 2 -2z")
     node(root,"path",id="calendar-grid",d=" ".join(grid),fill=COLORS["NONE"])
-    last_month=None; last_col=-10
-    for c,r,date,count,level in days:
-        key=(date.year,date.month)
-        if key!=last_month and c-last_col>=2:
-            text(root,x(c),58,date.strftime("%b").upper(),10,"#d0d0d0")
-            last_month=key; last_col=c
+    # Anchor labels to the column containing the first represented day of each month.
+    # Suppress only a clipped boundary month if its label would collide with the next.
+    months={}
+    for c,r,date,count,level in sorted(days,key=lambda d:d[2]):
+        months.setdefault((date.year,date.month),(c,date))
+    labels=list(months.values())
+    if len(labels)>1 and labels[0][1].day!=1 and labels[1][0]-labels[0][0]<3:
+        labels=labels[1:]
+    for c,date in labels:
+        # Right-align a clipped final label only if needed to keep it in the frame.
+        lx=x(c)
+        anchor="start" if lx+24<=880 else "end"
+        text(root,lx,58,date.strftime("%b").upper(),11,"#ededed",
+             text_anchor=anchor,id=f"month-{date.year}-{date.month:02d}")
+        node(root,"path",d=f"M{lx+6} 61v3",stroke="#777",fill="none")
+    # Persistent data layer: a hit removes the alien, never the contribution.
+    for c,r,date,count,level in active:
+        cell=node(root,"rect",id=f"activity-{c}-{r}",x=x(c),y=y(r),
+             width=CELL,height=CELL,rx=2,fill=COLORS[level],stroke="#f0f0f0",stroke_width=".65")
+        node(cell,"title").text=f"{date.isoformat()}: {count} contributions"
     # A projectile launches exactly as the ship crosses each occupied column.
     # It moves independently after launch, so the ship never waits for impact.
     hits={}
@@ -153,7 +174,7 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
             impact=launch+(SHIP_Y-(y(r)+6))/BULLET_SPEED
             hits[c,r]=impact
             tile=node(root,"g",transform=f"translate({cx(c)} {y(r)+6})")
-            node(tile,"rect",x=-6,y=-6,width=12,height=12,rx=2,fill=COLORS[level])
+            node(tile,"rect",x=-6,y=-6,width=12,height=12,rx=2,fill=COLORS[level],stroke="#f0f0f0",stroke_width=".65")
             # Nine-by-seven original bitmap sprite, with distinct eyes and legs.
             sprite=("010000010","001000100","011111110","110111011",
                     "111111111","101111101","001000100")
@@ -163,31 +184,33 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
                     if pixel=="1":
                         pixels.append(f"M{col-4.5} {row-3.5}h1v1h-1z")
             node(tile,"path",id=f"enemy-{c}-{r}",d=" ".join(pixels),
-                 fill="#151515" if level in ("THIRD_QUARTILE","FOURTH_QUARTILE") else "#f1f1f1")
+                 fill="#151515")
             # Two tiny edge highlights make the enemy cell read as an arcade tile.
             node(tile,"path",d="M-5 -4V-5H-3 M3 5H5V3",fill="none",
                  stroke="#fff",stroke_opacity=".35",stroke_width=".6")
             visible(tile,0,impact,duration)
             # Compact, fading pixel fragments; not a filter or an external resource.
-            blast=node(root,"g",transform=f"translate({cx(c)} {y(r)+6})")
+            blast=node(root,"g",id=f"impact-{c}-{r}",transform=f"translate({cx(c)} {y(r)+6})",opacity=0)
             # One impact group: white core, branching pixel lightning and debris.
             node(blast,"path",d="M-2 -2h4v4h-4z M-1 -10h2v5h-2z M-1 5h2v5h-2z M-10 -1h5v2h-5z M5 -1h5v2h-5z",fill="#fff")
             node(blast,"path",d="M-3 -3L-7 -6H-5L-9 -10 M3 -3L7 -6H5L9 -10 M-3 3L-7 6H-5L-9 10 M3 3L7 6H5L9 10",stroke="#aaa",stroke_width="1.2",fill="none")
             node(blast,"path",d="M-9 -6h2v2h-2z M7 4h2v2h-2z M-6 8h2v2h-2z M6 -9h2v2h-2z",fill="#e5e5e5")
-            end=impact+0.18
-            clock(blast,"animate","opacity",[0,0,1,.55,0,0],[0,impact-0.001,impact,impact+0.055,end,duration],duration)
+            node(blast,"path",d="M-12 -6V-12H-6 M6 -12H12V-6 M12 6V12H6 M-6 12H-12V6",stroke="#fff",stroke_width="1.4",fill="none")
+            end=impact+0.42
+            clock(blast,"animate","opacity",[0,0,1,1,.45,0,0],
+                  [0,impact-0.001,impact,impact+0.09,impact+0.23,end,duration],duration)
         end=launch+(SHIP_Y-top)/BULLET_SPEED
-        bolt=node(root,"g",opacity=0)
+        bolt=node(root,"g",id=f"projectile-{c}",opacity=0)
         # A layered pulse with a sharp white core and stepped ion trail.
         bx=cx(c)
         node(bolt,"path",d=f"M{bx-4} 1h2v-6h4v6h2v9h-2v5h-4v-5h-2z",fill="#555")
-        node(bolt,"path",d=f"M{bx-1.5} -7h3v14h-3z M{bx-.5} 7h1v9h-1z",fill="#fff")
+        node(bolt,"path",d=f"M{bx-2} -9h4v18h-4z M{bx-1} 9h2v16h-2z",fill="#fff")
         node(bolt,"path",d=f"M{bx-5} 4h2v4h-2z M{bx+3} 4h2v4h-2z M{bx-2} 19h1v3h-1z M{bx+1} 19h1v3h-1z",fill="#aaa")
         # Muzzle lightning is a single short-lived static shape, synchronized to launch.
         flash=node(root,"g",transform=f"translate({bx} {SHIP_Y})",opacity=0)
         node(flash,"path",d="M-2 -3H2V-9H4L0 -15L-4 -9H-2Z M-5 -2L-10 -7H-6L-8 -12 M5 -2L10 -7H6L8 -12",fill="#eee",stroke="#eee",stroke_width=".5")
-        clock(flash,"animate","opacity",[0,0,1,0,0],[0,launch-0.001,launch,launch+0.045,duration],duration)
-        visible(bolt,launch,end+0.008,duration)
+        clock(flash,"animate","opacity",[0,0,1,0,0],[0,launch-0.001,launch,launch+0.10,duration],duration)
+        visible(bolt,launch,end+0.09,duration)
         clock(bolt,"animateTransform","transform",[f"0 {SHIP_Y}",f"0 {SHIP_Y}",f"0 {top}",f"0 {top}"],
               [0,launch,end,duration],duration,type="translate")
     # Original pixel fighter: broad wings, stepped hull and twin thrusters.
@@ -207,12 +230,12 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         points+=events.get(times[i],0)
         counter=text(root,28,260,f"SCORE {points:04d}",15,"#ededed",font_weight="bold",letter_spacing=".5")
         visible(counter,times[i],times[i+1],duration)
-    text(root,WIDTH-28,260,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",10,"#d0d0d0",text_anchor="end")
+    text(root,WIDTH-28,260,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",12,"#f0f0f0",text_anchor="end")
     legend=node(root,"g",id="activity-legend")
-    text(legend,WIDTH/2-48,261,"LOW",9,"#a9a9a9",text_anchor="end")
+    text(legend,WIDTH/2-48,261,"LOW",11,"#e5e5e5",text_anchor="end")
     for i, color in enumerate(COLORS.values()):
-        node(legend,"rect",x=WIDTH/2-38+i*14,y=251,width=10,height=10,rx=2,fill=color)
-    text(legend,WIDTH/2+39,261,"HIGH",9,"#a9a9a9")
+        node(legend,"rect",x=WIDTH/2-38+i*14,y=251,width=11,height=11,rx=2,fill=color,stroke="#777",stroke_width=".5")
+    text(legend,WIDTH/2+39,261,"HIGH",11,"#e5e5e5")
     return ET.tostring(root,encoding="unicode")+"\n"
 
 def main():

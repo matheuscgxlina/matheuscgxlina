@@ -67,6 +67,38 @@ class OriginalTests(unittest.TestCase):
         self.assertEqual(len(tracks),2)
         ship=root.find(f".//{N}g[@id='player-ship']")
         self.assertEqual(len(list(ship.iter(N+"animateTransform"))),1)
+    def test_persistent_activity(self):
+        root=ET.fromstring(render(fixture()))
+        cells=[p for p in root.iter(N+"rect") if p.get("id","").startswith("activity-")]
+        self.assertEqual(len(cells),2)
+        self.assertEqual({p.get("fill") for p in cells},{"#aaaaaa","#ffffff"})
+        self.assertTrue(all(not list(p.iter(N+"animate")) for p in cells))
+        self.assertIn("PATROL MODE",ET.tostring(root,encoding="unicode"))
+    def test_visible_projectiles_and_impacts(self):
+        root=ET.fromstring(render(fixture()))
+        bolts=[g for g in root.iter(N+"g") if g.get("id","").startswith("projectile-")]
+        impacts=[g for g in root.iter(N+"g") if g.get("id","").startswith("impact-")]
+        self.assertEqual(len(bolts),2)
+        self.assertEqual(len(impacts),2)
+        for g in bolts:
+            a=g.find(N+"animate")
+            self.assertIn("1",a.get("values").split(";"))
+            self.assertIsNotNone(g.find(N+"animateTransform"))
+        for g in impacts:
+            a=g.find(N+"animate")
+            self.assertEqual(a.get("values"),"0;0;1;1;0.45;0;0")
+    def test_month_anchors(self):
+        from render import GRID_X, STEP
+        from collections import OrderedDict
+        days=calendar_data(fixture())
+        months={}
+        for c,r,date,count,level in sorted(days,key=lambda d:d[2]):
+            months.setdefault(f"month-{date.year}-{date.month:02d}",c)
+        root=ET.fromstring(render(fixture()))
+        labels=[n for n in root.iter(N+"text") if n.get("id","").startswith("month-")]
+        self.assertTrue(len(labels)>=12)
+        for label in labels:
+            self.assertEqual(int(label.get("x")),GRID_X+STEP*months[label.get("id")])
     def test_no_external_resources(self):
         s=render(fixture())
         self.assertNotIn("href=",s)
