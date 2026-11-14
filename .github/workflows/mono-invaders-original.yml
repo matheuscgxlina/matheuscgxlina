@@ -1,0 +1,48 @@
+name: MONO / INVADERS — Original
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/original/**'
+      - '.github/workflows/mono-invaders-original.yml'
+  schedule:
+    - cron: '47 3 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: mono-invaders-original
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: main
+      - name: Test independent engine
+        run: python3 -m unittest discover -s tools/original -p 'test_*.py' -v
+      - name: Generate real contribution SVG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/original/render.py --speed 220 --output assets/beyond/invaders-original.svg
+      - name: Publish validated original
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("README.md")
+          s=p.read_text()
+          old="assets/beyond/invaders-remake.gif"
+          new="assets/beyond/invaders-original.svg"
+          if old in s:
+              s=s.replace(old,new,1)
+              s=s.replace("MONO / INVADERS — REMAKE, based on gh-space-shooter (MIT).","MONO / INVADERS — Original Edition.")
+              p.write_text(s)
+          PY
+          git add -- assets/beyond/invaders-original.svg README.md
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Update original MONO Invaders arcade'
+          git push origin HEAD:main
