@@ -1,6 +1,5 @@
-
 <div align="center">
-  <img src="assets/beyond/hero.png?v=2" width="100%" alt="Matheus — Software development. Systems, performance and security." />
+  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/876bc468ff9563be8c957c7745bd75dc5c197dfb/assets/beyond/hero.png" width="100%" alt="Matheus — Software development. Systems, performance and security." />
 </div>
 
 ## 01 / About
@@ -51,7 +50,7 @@ Performance, security and maintainability belong together.
 ## 05 / Contribution Arcade
 
 <div align="center">
-  <img src="assets/beyond/invaders.svg?v=2" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
+  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/refs/heads/main/assets/beyond/invaders.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
 
   <p>
     <sub>Every contribution counts. Updated daily from GitHub activity.</sub>
