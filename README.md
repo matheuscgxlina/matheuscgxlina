@@ -50,10 +50,10 @@ Performance, security and maintainability belong together.
 ## 05 / Contribution Arcade
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/refs/heads/main/assets/beyond/invaders-remake.gif" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
+  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/refs/heads/main/assets/beyond/invaders-original.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
 
   <p>
-    <sub>Every contribution counts. Updated daily from GitHub activity. MONO / INVADERS — REMAKE, based on gh-space-shooter (MIT). MONO / INVADERS — REMAKE, based on gh-space-shooter (MIT).</sub>
+    <sub>Every contribution counts. Updated daily from GitHub activity. MONO / INVADERS — Original Edition. MONO / INVADERS — Original Edition.</sub>
   </p>
 </div>
 
