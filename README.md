@@ -50,7 +50,7 @@ Performance, security and maintainability belong together.
 ## 05 / Contribution Arcade
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/refs/heads/main/assets/beyond/invaders-original-v1.2.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
+  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/refs/heads/main/assets/beyond/invaders-original-v1.3.svg" width="100%" alt="MONO / INVADERS — animated GitHub contribution calendar." />
 
   <p>
     <sub>Every contribution counts. Updated daily from GitHub activity. MONO / INVADERS — Original Edition.</sub>
