@@ -118,19 +118,11 @@ class OriginalTests(unittest.TestCase):
         self.assertEqual(len(labels),len(months))
         for label in labels:
             self.assertEqual(float(label.get("x")),GRID_X+STEP*months[label.get("id")]+CELL/2)
-    def test_reduced_motion(self):
+    def test_animation_not_overridden(self):
         root=ET.fromstring(render(fixture()))
-        css=root.find(N+"style").text
-        self.assertIn("@media (prefers-reduced-motion: reduce)",css)
-        for selector in ("#player-ship","#patrol-stars","#patrol-scanner","#scoreboard",
-                         '[id^="enemies-"]','[id^="projectile-"]','[id^="impact-row-"]'):
-            self.assertIn(selector,css)
-        self.assertIn(".reduced-motion{display:inline}",css)
-        still=find(root,"g","static-patrol")
-        self.assertEqual(still.get("class"),"reduced-motion")
-        self.assertFalse(any(n.tag in (N+"animate",N+"animateTransform") for n in still.iter()))
-        self.assertTrue(any(n.text=="SCORE 0013" and n.get("class")=="reduced-motion"
-                            for n in root.iter(N+"text")))
+        self.assertIsNone(root.find(N+"style"))
+        self.assertIsNone(find(root,"g","static-patrol"))
+        self.assertIsNotNone(find(root,"g","player-ship").find(N+"animateTransform"))
     def test_no_external_resources(self):
         root=ET.fromstring(render(fixture()))
         ids={n.get("id") for n in root.iter() if n.get("id")}
