@@ -73,10 +73,16 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     node(root,"title",id="title").text="MONO / INVADERS — Contribution Arcade"
     total=sum(d[3] for d in active)
     node(root,"desc",id="desc").text=("Demo data. " if demo else "GitHub contribution calendar. ")+f"{len(active)} active days, {total} contributions. Continuous sweep with synchronized projectiles."
-    node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=10,fill="#101010",stroke="#383838")
-    text(root,22,25,"MONO / INVADERS",18,"#f1f1f1",font_weight="bold")
-    text(root,WIDTH-22,25,"DEMO / SAMPLE DATA" if demo else "CONTRIBUTION ARCADE",11,text_anchor="end")
-    node(root,"path",d=f"M22 37 H{WIDTH-22} M22 {FOOTER_Y} H{WIDTH-22}",stroke="#383838",fill="none")
+    node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=12,fill="#101010",stroke="#454545")
+    # Static, restrained instrument-panel styling. No additional animation tracks.
+    node(root,"rect",x=12,y=10,width=WIDTH-24,height=28,rx=5,fill="#181818")
+    node(root,"rect",x=22,y=17,width=3,height=14,fill="#ededed")
+    node(root,"rect",x=20,y=45,width=WIDTH-40,height=138,rx=6,fill="#141414",stroke="#252525")
+    node(root,"rect",x=20,y=185,width=WIDTH-40,height=46,rx=6,fill="#121212",stroke="#252525")
+    node(root,"rect",x=12,y=244,width=WIDTH-24,height=25,rx=5,fill="#181818")
+    text(root,33,29,"MONO / INVADERS",17,"#f1f1f1",font_weight="bold")
+    text(root,WIDTH-24,28,"DEMO / SAMPLE DATA" if demo else "CONTRIBUTION ARCADE",10,"#bcbcbc",text_anchor="end")
+    node(root,"path",d=f"M22 40 H{WIDTH-22} M22 {FOOTER_Y} H{WIDTH-22}",stroke="#353535",fill="none")
     x=lambda c:GRID_X+c*STEP
     y=lambda r:GRID_Y+r*STEP
     cx=lambda c:x(c)+CELL/2
@@ -91,7 +97,7 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     for c,r,date,count,level in days:
         key=(date.year,date.month)
         if key!=last_month and c-last_col>=2:
-            text(root,x(c),55,date.strftime("%b").upper(),10)
+            text(root,x(c),59,date.strftime("%b").upper(),10,"#a0a0a0")
             last_month=key; last_col=c
     # A projectile launches exactly as the ship crosses each occupied column.
     # It moves independently after launch, so the ship never waits for impact.
@@ -121,11 +127,13 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         visible(bolt,launch,end+0.008,duration)
         clock(bolt,"animateTransform","transform",[f"0 {SHIP_Y}",f"0 {SHIP_Y}",f"0 {top}",f"0 {top}"],
               [0,launch,end,duration],duration,type="translate")
-    # Original MONO silhouette, enlarged to 42 x 30 px; stationary engine.
+    # Original MONO silhouette, angular fighter with static metallic facets.
     ship=node(root,"g",id="player-ship",transform=f"translate({LEFT} 0)")
-    node(ship,"path",d="M-3 190H3V195H7V200H11V205H15V198H21V218H12V215H6V220H-6V215H-12V218H-21V198H-15V205H-11V200H-7V195H-3Z",fill="#ededed")
-    node(ship,"rect",x=-3,y=201,width=6,height=9,fill="#777")
-    node(ship,"path",d="M-11 219h5v4h-5z M6 219h5v4h-5z",fill="#999")
+    node(ship,"path",id="fighter-hull",d="M-3 190H3V194H6V199H9V204H13V201H17V196H21V216H15V219H9V216H5V222H-5V216H-9V219H-15V216H-21V196H-17V201H-13V204H-9V199H-6V194H-3Z",fill="#ededed")
+    node(ship,"path",d="M-17 202H-13V208H-9V213H-17Z M17 202H13V208H9V213H17Z",fill="#858585")
+    node(ship,"path",d="M-3 198H3V202H5V211H-5V202H-3Z",fill="#393939")
+    node(ship,"rect",x=-2,y=201,width=4,height=5,fill="#bcbcbc")
+    node(ship,"path",d="M-12 219h4v4h-4z M8 219h4v4h-4z",fill="#a0a0a0")
     clock(ship,"animateTransform","transform",[f"{LEFT} 0",f"{RIGHT} 0",f"{LEFT} 0"],
           [0,half,duration],duration,type="translate")
     # Real contribution count, not health or fabricated game points.
@@ -137,7 +145,7 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
         counter=text(root,22,261,f"SCORE {points:04d}",14,"#ededed",font_weight="bold")
         visible(counter,times[i],times[i+1],duration)
     text(root,WIDTH-22,261,f"{len(active)} ACTIVE DAYS / {total} CONTRIBUTIONS",11,text_anchor="end")
-    text(root,WIDTH/2,261,"BY MATHEUS",9,"#777",text_anchor="middle")
+    text(root,WIDTH/2,261,"BY MATHEUS  /  ORIGINAL",10,"#a0a0a0",text_anchor="middle")
     return ET.tostring(root,encoding="unicode")+"\n"
 
 def main():

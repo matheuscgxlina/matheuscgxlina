@@ -47,6 +47,13 @@ class OriginalTests(unittest.TestCase):
         self.assertEqual(len(root.findall(f".//{N}path[@id='calendar-grid']")),1)
         for speed in (0,301,float("nan")):
             with self.assertRaises(ValueError): render(fixture(),speed)
+    def test_visual_identity(self):
+        root=ET.fromstring(render(fixture()))
+        self.assertIsNotNone(root.find(f".//{N}path[@id='fighter-hull']"))
+        ship=root.find(f".//{N}g[@id='player-ship']")
+        self.assertEqual(len(list(ship.iter(N+"animateTransform"))),1)
+        self.assertEqual(len(list(ship.iter(N+"animate"))),0)
+        self.assertIn("BY MATHEUS  /  ORIGINAL",ET.tostring(root,encoding="unicode"))
     def test_no_external_resources(self):
         s=render(fixture())
         self.assertNotIn("href=",s)
