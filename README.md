@@ -1,3 +1,4 @@
+
 <div align="center">
   <img src="assets/header.svg" width="100%" alt="Matheus — Build. Learn. Engineer." />
 </div>
@@ -35,20 +36,29 @@ I'm a software development student with a passion for building fast, reliable an
   </tr>
 </table>
 
-## Toolkit
+## Technologies & Tools
+
+<div align="center">
 
 **Working with**
 
-![PowerShell](assets/powershell.svg)
-![Git](assets/git.svg)
-![GitHub](assets/github.svg)
-![Windows](assets/windows.svg)
+<br />
+
+<img src="https://skillicons.dev/icons?i=powershell,git,github,windows&theme=dark" alt="PowerShell, Git, GitHub, Windows" />
+
+<br /><br />
 
 **Currently exploring**
 
-![C#](assets/csharp.svg)
-![.NET](assets/dotnet.svg)
-![WPF](assets/wpf.svg)
+<br />
+
+<img src="https://skillicons.dev/icons?i=cs,dotnet,visualstudio&theme=dark" alt="C#, .NET, Visual Studio" />
+
+<br />
+
+<sub>C# · .NET · Desktop development with WPF</sub>
+
+</div>
 
 ## Engineering mindset
 
