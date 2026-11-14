@@ -5,6 +5,7 @@ on:
     branches: [v1.6-refine]
     paths:
       - 'tools/original/**'
+      - 'tools/generate_invaders.py'
       - '.github/workflows/mono-invaders-original.yml'
       - 'README.md'
   pull_request:

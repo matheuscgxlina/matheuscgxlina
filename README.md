@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/matheuscgxlina/matheuscgxlina/876bc468ff9563be8c957c7745bd75dc5c197dfb/assets/beyond/hero.png" width="100%" alt="Matheus — Software development. Systems, performance and security." />
+  <img src="assets/beyond/hero.png" width="100%" alt="Matheus — Software development. Systems, performance and security." />
 </div>
 
 ## 01 / About
@@ -41,9 +41,9 @@ I'm a software development student fascinated by how systems work beneath the su
   </p>
 </div>
 
-## 04 / Projetos
+## 04 / Projects
 
-**[MONO / INVADERS — Profile repository](https://github.com/matheuscgxlina/matheuscgxlina)** — Independent monochrome GitHub contribution arcade with an SVG renderer and automated updates.
+**[MONO / INVADERS — Profile repository](https://github.com/matheuscgxlina/matheuscgxlina)** — Monochrome GitHub contribution arcade with an SVG renderer and daily automated updates.
 
 <!--
 Add up to two additional public repositories here when they are ready.

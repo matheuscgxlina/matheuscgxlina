@@ -74,6 +74,12 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     node(root,"title",id="title").text="MONO / INVADERS — Contribution Arcade"
     total=sum(d[3] for d in active)
     node(root,"desc",id="desc").text=("Demo data. " if demo else "GitHub contribution calendar. ")+f"{len(active)} active days, {total} contributions. Continuous sweep with synchronized projectiles."
+    # CSS hides animated layers rather than trying to pause SMIL via animation-play-state.
+    node(root,"style").text=""".reduced-motion{display:none}
+@media (prefers-reduced-motion: reduce){
+#player-ship,#patrol-stars,#patrol-scanner,#scoreboard,[id^="enemies-"],[id^="projectile-"],[id^="impact-row-"]{display:none}
+.reduced-motion{display:inline}
+}"""
     # Retro arcade presentation: static vector art only.
     node(root,"rect",x=0.5,y=0.5,width=WIDTH-1,height=HEIGHT-1,rx=10,fill="#090909",stroke="#454545")
     node(root,"path",id="retro-frame",d="M18 5H886L899 18V260L886 273H18L5 260V18Z",fill="none",stroke="#bdbdbd",stroke_width=1.5)
@@ -280,6 +286,18 @@ def render(calendar, speed=DEFAULT_SPEED, demo=False):
     node(ship,"path",d="M-12 220h4v5h-4z M8 220h4v5h-4z",fill="#aaa")
     clock(ship,"animateTransform","transform",[f"{LEFT} 0",f"{RIGHT} 0",f"{LEFT} 0"],
           [0,half,duration],duration,type="translate")
+    # The reduced-motion alternative has no SMIL animations; retain the real data layer.
+    still=node(root,"g",id="static-patrol",**{"class":"reduced-motion"})
+    # Copy only the static ship geometry, not its animation or IDs.
+    for child in ship:
+        if child.tag in ("{"+NS+"}animate","{"+NS+"}animateTransform"): continue
+        copy=ET.fromstring(ET.tostring(child))
+        copy.attrib.pop("id",None)
+        still.append(copy)
+    still.set("transform",f"translate({WIDTH//2} 0)")
+    static_stars=node(root,"path",d=" ".join(stars),fill="#777",**{"class":"reduced-motion"})
+    text(root,28,260,f"SCORE {total:04d}",15,"#ededed",font_weight="bold",
+         letter_spacing=".5",**{"class":"reduced-motion"})
     # Compact rolling digit strips: the score changes at each actual hit.
     events={}
     for c,r,_,count,_ in active: events[hits[c,r]]=events.get(hits[c,r],0)+count

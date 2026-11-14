@@ -22,8 +22,8 @@ For real data, supply GITHUB_TOKEN through the environment and omit --demo. Neve
 
 ## Origins and attribution
 
-The MONO / INVADERS evolves the independent MONO / INVADERS SVG generator created before the REMAKE experiment. It does not import or incorporate the gh-space-shooter engine. The space-shooter calendar concept is inspired by community projects, including gh-space-shooter. The separate historical REMAKE implementation retains its upstream MIT notice in tools/remake/LICENSE. Development was assisted by AI. Do not claim authorship of upstream third-party code.
+The MONO / INVADERS evolves the independent MONO / INVADERS SVG generator created before the REMAKE experiment. It does not import or incorporate the gh-space-shooter engine. The space-shooter calendar concept is inspired by community projects, including gh-space-shooter. The historical REMAKE experiment is retired; its upstream MIT notice remains in tools/remake/LICENSE for attribution. Development was assisted by AI. Do not claim authorship of upstream third-party code.
 
 ## Status
 
-v1.6 refinement: persistent contribution colors, pooled projectiles, clipping-based enemy destruction, rolling score digits, month alignment and a strict 100 KB SVG budget. CI tests sparse and dense calendars. Pull requests validate read-only; scheduled publishing updates the generated asset only. Visual smoothness remains subject to browser rendering. The previous REMAKE and its assets remain available for rollback.
+v1.6 refinement: persistent contribution colors, pooled projectiles, clipping-based enemy destruction, rolling score digits, month alignment and a strict 100 KB SVG budget. CI tests sparse and dense calendars. Pull requests validate read-only; scheduled publishing updates the generated asset only. A CSS prefers-reduced-motion rule swaps animated layers for a static ship, stars and final score while preserving the calendar. Visual smoothness remains subject to browser rendering. Retired renderers and generated images are removed from the working tree; earlier versions remain in Git history.
